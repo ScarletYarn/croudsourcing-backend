@@ -1,0 +1,15 @@
+package com.ecnucrowdsourcing.croudsourcingbackend.util;
+
+import org.springframework.stereotype.Component;
+
+@Component
+public class ResponseUtil {
+
+  public Response<Boolean> success() {
+    return new Response<>(null, true);
+  }
+
+  public Response<Object> fail(String msg) {
+    return new Response<>(msg, null);
+  }
+}

@@ -1,0 +1,9 @@
+server:
+  port: 8080
+  servlet:
+    session:
+      timeout: 5m
+#debug: true
+spring:
+  profiles:
+    active: dev
