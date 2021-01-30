@@ -66,11 +66,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
   @Override
   protected void configure(HttpSecurity http) throws Exception {
     http.authorizeRequests()
-            .antMatchers("/demo/greet", "/", "/home", "/login", "/roles", "/user/**").permitAll()
+            .antMatchers("/", "/home", "/login", "/user/roles", "/user/signup").permitAll()
             .and()
             .formLogin()
             .loginPage("/login")
-            .usernameParameter("username")
+            .usernameParameter("phone")
             .passwordParameter("password")
             .successHandler((req, res, auth) -> res.setStatus(HttpStatus.OK.value()))
             .failureHandler((req, response, e) -> {
