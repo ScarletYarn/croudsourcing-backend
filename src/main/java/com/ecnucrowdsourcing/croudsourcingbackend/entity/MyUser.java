@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 @Document(indexName = "#{@IndexPrefixProvider.indexPrefix()}my_user")
@@ -27,6 +28,12 @@ public class MyUser implements UserDetails {
   private String password;
 
   private List<String> roles;
+
+  private String alipay;
+
+  private String phone;
+
+  private Date signupDate;
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -1,13 +1,20 @@
 package com.ecnucrowdsourcing.croudsourcingbackend.controller;
 
 import com.ecnucrowdsourcing.croudsourcingbackend.config.SecurityConfiguration;
+import com.ecnucrowdsourcing.croudsourcingbackend.config.SecurityUserDetail;
 import com.ecnucrowdsourcing.croudsourcingbackend.entity.MyUser;
 import com.ecnucrowdsourcing.croudsourcingbackend.repository.MyUserRepo;
+import com.ecnucrowdsourcing.croudsourcingbackend.util.Response;
+import com.ecnucrowdsourcing.croudsourcingbackend.util.ResponseUtil;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -17,36 +24,64 @@ public class UserController {
   @Resource
   private MyUserRepo myUserRepo;
 
-  @GetMapping("/findById")
-  MyUser findById(@RequestParam String id) {
-    return myUserRepo.findById(id).orElse(null);
+  @Resource
+  private ResponseUtil responseUtil;
+
+  @ApiOperation("Used for signup")
+  @PutMapping("/signup")
+  Response<Boolean> signup(@RequestParam String phone,
+                           @RequestParam String password,
+                           @RequestParam String username,
+                           @RequestParam String alipay) {
+    List<MyUser> users = myUserRepo.findAllByPhone(phone);
+    if (!users.isEmpty()) return responseUtil.fail("手机号已注册");
+    try {
+      MyUser myUser = new MyUser();
+      myUser.setPhone(phone);
+      myUser.setPassword(new BCryptPasswordEncoder().encode(password));
+      myUser.setSignupDate(new Date());
+      myUser.setUsername(username);
+      myUser.setAlipay(alipay);
+      myUser.setRoles(new ArrayList<>(){{
+        add("ROLE_" + SecurityConfiguration.ROLE_USER);
+      }});
+      myUserRepo.save(myUser);
+      return responseUtil.success();
+    } catch (Exception e) {
+      e.printStackTrace();
+      return responseUtil.fail("登陆失败");
+    }
   }
 
-  @GetMapping("/findByName")
-  List<MyUser> findByName(@RequestParam String name) {
-    return myUserRepo.findAllByUsername(name);
+  @ApiOperation("Empty list before login, [\"ROLE_USER\"] after login")
+  @GetMapping("/roles")
+  Response<List<String>> roles() {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    if (authentication == null) {
+      return new Response<>("未登陆", new ArrayList<>());
+    } else {
+      return new Response<>(null, new ArrayList<>(){{
+        authentication.getAuthorities().forEach(e -> add(e.toString()));
+      }});
+    }
   }
 
-  @PutMapping("/insert")
-  String insert(@RequestParam String username,
-              @RequestParam String password) {
-    MyUser myUser = new MyUser();
-    myUser.setUsername(username);
-    myUser.setPassword(new BCryptPasswordEncoder().encode(password));
-    myUser.setRoles(new ArrayList<>(){{
-      add("ROLE_" + SecurityConfiguration.ROLE_USER);
-    }});
-    myUserRepo.save(myUser);
-    return myUser.getId();
-  }
-
-  @GetMapping("/all")
-  List<MyUser> getAll() {
-    return myUserRepo.findAll();
-  }
-
-  @GetMapping("/dropAll")
-  void deleteAll() {
-    myUserRepo.deleteAll();
+  @ApiOperation("Get information about the current user")
+  @GetMapping("/me")
+  Response<MyUser> me() {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    if (authentication == null) {
+      return new Response<>("未查询到信息", null);
+    } else {
+      try {
+        SecurityUserDetail securityUserDetail = (SecurityUserDetail) authentication.getPrincipal();
+        MyUser myUser = myUserRepo.findAllByPhone(securityUserDetail.getPhone()).get(0);
+        myUser.setPassword(null);
+        return new Response<>(null, myUser);
+      } catch (Exception e) {
+        e.printStackTrace();
+        return new Response<>("未查询到信息", null);
+      }
+    }
   }
 }

@@ -10,6 +10,8 @@ public interface MyUserRepo extends ElasticsearchRepository<MyUser, String> {
 
   Optional<MyUser> findById(String id);
 
+  List<MyUser> findAllByPhone(String phone);
+
   List<MyUser> findAll();
 
   List<MyUser> findAllByUsername(String name);
