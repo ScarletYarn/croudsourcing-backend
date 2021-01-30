@@ -7,3 +7,5 @@ server:
 spring:
   profiles:
     active: dev
+  pid:
+    file: /var/log/app.pid
