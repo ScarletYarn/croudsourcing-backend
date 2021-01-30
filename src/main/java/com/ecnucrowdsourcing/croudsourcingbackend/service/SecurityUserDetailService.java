@@ -23,7 +23,7 @@ public class SecurityUserDetailService implements UserDetailsService {
 
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    List<MyUser> users = myUserRepo.findAllByUsername(username);
+    List<MyUser> users = myUserRepo.findAllByPhone(username);
     if (users.isEmpty()) throw new UsernameNotFoundException("User not found! ");
     MyUser myUser = users.get(0);
     if (myUser == null) {
@@ -33,7 +33,7 @@ public class SecurityUserDetailService implements UserDetailsService {
       for (String role : myUser.getRoles()) add(new SimpleGrantedAuthority(role));
     }};
     SecurityUserDetail securityUserDetail = new SecurityUserDetail(myUser.getUsername(), myUser.getPassword(), authorities);
-    securityUserDetail.setId(myUser.getId());
+    securityUserDetail.setPhone(myUser.getPhone());
     return securityUserDetail;
   }
 }
