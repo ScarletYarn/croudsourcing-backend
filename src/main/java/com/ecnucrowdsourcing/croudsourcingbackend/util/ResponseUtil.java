@@ -9,7 +9,7 @@ public class ResponseUtil {
     return new Response<>(null, true);
   }
 
-  public Response<Object> fail(String msg) {
-    return new Response<>(msg, null);
+  public Response<Boolean> fail(String msg) {
+    return new Response<>(msg, false);
   }
 }
