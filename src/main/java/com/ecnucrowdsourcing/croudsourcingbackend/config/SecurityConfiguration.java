@@ -21,7 +21,7 @@ import java.io.PrintWriter;
 import java.util.List;
 
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
   public static final String ROLE_USER = "USER";
@@ -39,6 +39,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
   @Resource
   private ResponseUtil responseUtil;
+
+  @Resource
+  private IndexPrefixProvider indexPrefixProvider;
 
   @Override
   protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -65,9 +68,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
-    http.authorizeRequests()
-            .antMatchers("/", "/home", "/login", "/user/roles", "/user/signup").permitAll()
-            .and()
+    http.authorizeRequests(authorizeRequests ->
+      authorizeRequests
+          .antMatchers("/login", "/signup", "/swagger-ui", "/job/insert", "/payment/insert").permitAll()
+          .antMatchers("/**").authenticated()
+    )
             .formLogin()
             .loginPage("/login")
             .usernameParameter("phone")
@@ -95,9 +100,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .and()
             .cors()
             .and()
-            .csrf()
-            .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-            .and()
             .exceptionHandling().accessDeniedHandler(myAccessDeniedHandler)
             .authenticationEntryPoint(customAuthenticationEntryPoint)
             .and()
@@ -105,5 +107,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .maximumSessions(1)
             .maxSessionsPreventsLogin(false)
             .expiredUrl("/login");
+
+    /* If csrf protection is enabled, request method will be limited without the token
+     * If requests don't come from browser, http 403 will occur */
+    if (indexPrefixProvider.profile.equals("dev")) http.csrf().disable();
+    else http.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
   }
 }

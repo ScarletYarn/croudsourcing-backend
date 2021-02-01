@@ -84,4 +84,27 @@ public class UserController {
       }
     }
   }
+
+  @ApiOperation("Update user information")
+  @PostMapping("/update")
+  Response<Boolean> update(
+          @RequestParam(required = false) String aliPay,
+          @RequestParam(required = false) String username
+  ) {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    if (authentication == null) {
+      return responseUtil.fail("登陆信息错误");
+    } else {
+      try {
+        SecurityUserDetail securityUserDetail = (SecurityUserDetail) authentication.getPrincipal();
+        MyUser myUser = myUserRepo.findAllByPhone(securityUserDetail.getPhone()).get(0);
+        if (aliPay != null) myUser.setAlipay(aliPay);
+        if (username != null) myUser.setUsername(username);
+        myUserRepo.save(myUser);
+        return responseUtil.success();
+      } catch (Exception e) {
+        return responseUtil.fail("更新失败");
+      }
+    }
+  }
 }
