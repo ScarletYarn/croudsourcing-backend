@@ -34,6 +34,7 @@ public class SecurityUserDetailService implements UserDetailsService {
     }};
     SecurityUserDetail securityUserDetail = new SecurityUserDetail(myUser.getUsername(), myUser.getPassword(), authorities);
     securityUserDetail.setPhone(myUser.getPhone());
+    securityUserDetail.setId(myUser.getId());
     return securityUserDetail;
   }
 }

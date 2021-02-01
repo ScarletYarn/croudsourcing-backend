@@ -13,6 +13,8 @@ public class SecurityUserDetail extends User {
 
   private String phone;
 
+  private String id;
+
   public SecurityUserDetail(String username, String password, Collection<? extends GrantedAuthority> authorities) {
     super(username, password, authorities);
   }
