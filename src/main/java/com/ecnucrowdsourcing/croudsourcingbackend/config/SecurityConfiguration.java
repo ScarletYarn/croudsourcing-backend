@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -70,7 +71,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
   protected void configure(HttpSecurity http) throws Exception {
     http.authorizeRequests(authorizeRequests ->
       authorizeRequests
-          .antMatchers("/login", "/signup", "/swagger-ui", "/job/insert", "/payment/insert").permitAll()
+          .antMatchers("/login", "/user/signup", "/job/insert", "/payment/insert").permitAll()
           .antMatchers("/**").authenticated()
     )
             .formLogin()
@@ -82,7 +83,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
               response.setStatus(HttpStatus.UNAUTHORIZED.value());
               response.setContentType("application/json;charset=UTF-8");
               PrintWriter writer = response.getWriter();
-              writer.write(new ObjectMapper().writeValueAsString(responseUtil.fail("Authentication failed")));
+              writer.write(new ObjectMapper().writeValueAsString(responseUtil.fail("用户名或密码错误")));
               writer.flush();
               writer.close();
             })
@@ -112,5 +113,15 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
      * If requests don't come from browser, http 403 will occur */
     if (indexPrefixProvider.profile.equals("dev")) http.csrf().disable();
     else http.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
+  }
+
+  @Override
+  public void configure(WebSecurity web) throws Exception {
+    web.ignoring().antMatchers( "/swagger-ui.html",
+        "/swagger-ui/*",
+        "/swagger-resources/**",
+        "/v2/api-docs",
+        "/v3/api-docs",
+        "/webjars/**");
   }
 }
