@@ -103,6 +103,7 @@ public class UserController {
         myUserRepo.save(myUser);
         return responseUtil.success();
       } catch (Exception e) {
+        e.printStackTrace();
         return responseUtil.fail("更新失败");
       }
     }
