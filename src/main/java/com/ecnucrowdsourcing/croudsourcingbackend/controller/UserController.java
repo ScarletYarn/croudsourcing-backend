@@ -3,9 +3,12 @@ package com.ecnucrowdsourcing.croudsourcingbackend.controller;
 import com.ecnucrowdsourcing.croudsourcingbackend.config.SecurityConfiguration;
 import com.ecnucrowdsourcing.croudsourcingbackend.config.SecurityUserDetail;
 import com.ecnucrowdsourcing.croudsourcingbackend.entity.MyUser;
+import com.ecnucrowdsourcing.croudsourcingbackend.entity.Questionnaire;
 import com.ecnucrowdsourcing.croudsourcingbackend.repository.MyUserRepo;
+import com.ecnucrowdsourcing.croudsourcingbackend.repository.QuestionnaireRepo;
 import com.ecnucrowdsourcing.croudsourcingbackend.util.Response;
 import com.ecnucrowdsourcing.croudsourcingbackend.util.ResponseUtil;
+import com.ecnucrowdsourcing.croudsourcingbackend.util.UserDetailUtil;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,6 +30,12 @@ public class UserController {
   @Resource
   private ResponseUtil responseUtil;
 
+  @Resource
+  private UserDetailUtil userDetailUtil;
+
+  @Resource
+  private QuestionnaireRepo questionnaireRepo;
+
   @ApiOperation("Used for signup")
   @PutMapping("/signup")
   Response<Boolean> signup(@RequestParam String phone,
@@ -35,54 +44,34 @@ public class UserController {
                            @RequestParam String alipay) {
     List<MyUser> users = myUserRepo.findAllByPhone(phone);
     if (!users.isEmpty()) return responseUtil.fail("手机号已注册");
-    try {
-      MyUser myUser = new MyUser();
-      myUser.setPhone(phone);
-      myUser.setPassword(new BCryptPasswordEncoder().encode(password));
-      myUser.setSignupDate(new Date());
-      myUser.setUsername(username);
-      myUser.setAlipay(alipay);
-      myUser.setRoles(new ArrayList<>(){{
-        add("ROLE_" + SecurityConfiguration.ROLE_USER);
-      }});
-      myUserRepo.save(myUser);
-      return responseUtil.success();
-    } catch (Exception e) {
-      e.printStackTrace();
-      return responseUtil.fail("登陆失败");
-    }
+    MyUser myUser = new MyUser();
+    myUser.setPhone(phone);
+    myUser.setPassword(new BCryptPasswordEncoder().encode(password));
+    myUser.setSignupDate(new Date());
+    myUser.setUsername(username);
+    myUser.setAlipay(alipay);
+    myUser.setRoles(new ArrayList<>(){{
+      add("ROLE_" + SecurityConfiguration.ROLE_USER);
+    }});
+    myUserRepo.save(myUser);
+    return responseUtil.success();
   }
 
   @ApiOperation("Empty list before login, [\"ROLE_USER\"] after login")
   @GetMapping("/roles")
   Response<List<String>> roles() {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    if (authentication == null) {
-      return new Response<>("未登陆", new ArrayList<>());
-    } else {
-      return new Response<>(null, new ArrayList<>(){{
-        authentication.getAuthorities().forEach(e -> add(e.toString()));
-      }});
-    }
+    return new Response<>(null, new ArrayList<>(){{
+      userDetailUtil.getUserDetail().getAuthorities().forEach(e -> add(e.toString()));
+    }});
   }
 
   @ApiOperation("Get information about the current user")
   @GetMapping("/me")
   Response<MyUser> me() {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    if (authentication == null) {
-      return new Response<>("未查询到信息", null);
-    } else {
-      try {
-        SecurityUserDetail securityUserDetail = (SecurityUserDetail) authentication.getPrincipal();
-        MyUser myUser = myUserRepo.findAllByPhone(securityUserDetail.getPhone()).get(0);
-        myUser.setPassword(null);
-        return new Response<>(null, myUser);
-      } catch (Exception e) {
-        e.printStackTrace();
-        return new Response<>("未查询到信息", null);
-      }
-    }
+    String userId = userDetailUtil.getUserDetail().getId();
+    MyUser myUser = myUserRepo.findById(userId).orElse(null);
+    if (myUser != null) myUser.setPassword(null);
+    return new Response<>(null, myUser);
   }
 
   @ApiOperation("Update user information")
@@ -90,22 +79,43 @@ public class UserController {
   Response<Boolean> update(
           @RequestParam(required = false) String aliPay,
           @RequestParam(required = false) String username
+  ) throws Exception {
+    String userId = userDetailUtil.getUserDetail().getId();
+    MyUser myUser = myUserRepo.findById(userId).orElse(null);
+    if (myUser == null) throw new Exception("用户不存在");
+    if (aliPay != null) myUser.setAlipay(aliPay);
+    if (username != null) myUser.setUsername(username);
+    myUserRepo.save(myUser);
+    return responseUtil.success();
+  }
+
+  @ApiOperation("Get the questionnaire for the current user")
+  @GetMapping("/questionnaire/q")
+  Response<Questionnaire> getQuestionnaire() {
+    String userId = userDetailUtil.getUserDetail().getId();
+    return new Response<>(null, questionnaireRepo.findByUserId(userId).orElse(null));
+  }
+
+  @ApiOperation("Upload the questionnaire of the current user")
+  @PutMapping("/questionnaire/p")
+  Response<Boolean> putQuestionnaire(
+      @RequestParam String name,
+      @RequestParam String age,
+      @RequestParam String gender,
+      @RequestParam String kg,
+      @RequestParam String education,
+      @RequestParam List<String> rating
   ) {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    if (authentication == null) {
-      return responseUtil.fail("登陆信息错误");
-    } else {
-      try {
-        SecurityUserDetail securityUserDetail = (SecurityUserDetail) authentication.getPrincipal();
-        MyUser myUser = myUserRepo.findAllByPhone(securityUserDetail.getPhone()).get(0);
-        if (aliPay != null) myUser.setAlipay(aliPay);
-        if (username != null) myUser.setUsername(username);
-        myUserRepo.save(myUser);
-        return responseUtil.success();
-      } catch (Exception e) {
-        e.printStackTrace();
-        return responseUtil.fail("更新失败");
-      }
-    }
+    String userId = userDetailUtil.getUserDetail().getId();
+    Questionnaire q = new Questionnaire();
+    q.setUserId(userId);
+    q.setName(name);
+    q.setAge(age);
+    q.setGender(gender);
+    q.setKg(kg);
+    q.setEducation(education);
+    q.setRatings(rating);
+    questionnaireRepo.save(q);
+    return responseUtil.success();
   }
 }
