@@ -1,16 +1,20 @@
 package com.ecnucrowdsourcing.croudsourcingbackend.controller;
 
 import com.ecnucrowdsourcing.croudsourcingbackend.entity.Job;
+import com.ecnucrowdsourcing.croudsourcingbackend.entity.Reward;
+import com.ecnucrowdsourcing.croudsourcingbackend.entity.constant.RewardStatus;
 import com.ecnucrowdsourcing.croudsourcingbackend.repository.JobRepo;
+import com.ecnucrowdsourcing.croudsourcingbackend.repository.RewardRepo;
 import com.ecnucrowdsourcing.croudsourcingbackend.util.Response;
 import com.ecnucrowdsourcing.croudsourcingbackend.util.ResponseUtil;
+import com.ecnucrowdsourcing.croudsourcingbackend.util.UserDetailUtil;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import javax.annotation.security.PermitAll;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/job")
@@ -20,7 +24,13 @@ public class JobController {
   private JobRepo jobRepo;
 
   @Resource
+  private RewardRepo rewardRepo;
+
+  @Resource
   private ResponseUtil responseUtil;
+
+  @Resource
+  private UserDetailUtil userDetailUtil;
 
   @ApiOperation("Get a list of all jobs")
   @GetMapping("/all")
@@ -28,19 +38,37 @@ public class JobController {
     return new Response<>(null, jobRepo.findAll());
   }
 
+  @ApiOperation("Complete a job")
+  @PutMapping("/complete")
+  Response<Boolean> complete(@RequestParam String jobId) throws Exception {
+    Reward reward = new Reward();
+    String userId = userDetailUtil.getUserDetail().getId();
+    reward.setJobId(jobId);
+    reward.setCompleteTime(new Date());
+    reward.setStatus(RewardStatus.UNPAID.name());
+    reward.setUserId(userId);
+    Optional<Job> jobOptional = jobRepo.findById(jobId);
+    if (jobOptional.isPresent()) reward.setValue(jobOptional.get().getReward());
+    else throw new Exception("不存在的工作");
+    rewardRepo.save(reward);
+    return responseUtil.success();
+  }
+
+  @ApiOperation("Query for details about a job")
+  @GetMapping("/q")
+  Response<Job> query(@RequestParam String jobId) {
+    Optional<Job> jobOptional = jobRepo.findById(jobId);
+    return new Response<>(null, jobOptional.orElse(null));
+  }
+
   @PutMapping("/insert")
   Response<Boolean> insert(@RequestParam String jobName) {
-    try {
-      Job job = new Job();
-      job.setName(jobName);
-      job.setPublishDate(new Date());
-      job.setDesc("A dummy job");
-      job.setReward(10000);
-      jobRepo.save(job);
-      return responseUtil.success();
-    } catch (Exception e) {
-      e.printStackTrace();
-      return responseUtil.fail("插入失败");
-    }
+    Job job = new Job();
+    job.setName(jobName);
+    job.setPublishDate(new Date());
+    job.setDesc("A dummy job");
+    job.setReward(10000);
+    jobRepo.save(job);
+    return responseUtil.success();
   }
 }
