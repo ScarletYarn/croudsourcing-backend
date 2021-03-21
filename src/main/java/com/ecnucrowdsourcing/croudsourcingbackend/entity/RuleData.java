@@ -23,5 +23,5 @@ public class RuleData {
 
   private String instance;
 
-  private Integer goldenAnswer;
+  private String goldenAnswer;
 }
