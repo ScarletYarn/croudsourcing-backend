@@ -25,6 +25,8 @@ public class AnswerRecord {
 
   private Date date;
 
+  private Integer noExpScore;
+
   private Integer graphScore;
 
   private Integer nlScore;

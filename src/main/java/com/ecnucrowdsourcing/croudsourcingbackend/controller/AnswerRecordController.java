@@ -39,6 +39,7 @@ public class AnswerRecordController {
       @RequestParam String jobId,
       @RequestParam String ruleDataId,
       @RequestParam String answer,
+      @RequestParam Integer noExpScore,
       @RequestParam Integer graphScore,
       @RequestParam Integer nlScore,
       @RequestParam Integer instanceScore
@@ -49,6 +50,7 @@ public class AnswerRecordController {
     answerRecord.setJobId(jobId);
     answerRecord.setRuleDataId(ruleDataId);
     answerRecord.setAnswer(Answer.valueOf(answer).name());
+    answerRecord.setNoExpScore(noExpScore);
     answerRecord.setDate(new Date());
     answerRecord.setGraphScore(graphScore);
     answerRecord.setNlScore(nlScore);
