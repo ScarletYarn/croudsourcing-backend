@@ -24,4 +24,6 @@ public class RuleData {
   private String instance;
 
   private String goldenAnswer;
+
+  private Integer difficulty;
 }
