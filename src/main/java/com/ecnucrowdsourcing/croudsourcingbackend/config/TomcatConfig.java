@@ -19,7 +19,7 @@ public class TomcatConfig {
 
     @Override
     public void registerErrorPages(ErrorPageRegistry registry) {
-      registry.addErrorPages(new ErrorPage(HttpStatus.NOT_FOUND, "/"));
+      registry.addErrorPages(new ErrorPage(HttpStatus.NOT_FOUND, "/index.html"));
     }
   }
 }

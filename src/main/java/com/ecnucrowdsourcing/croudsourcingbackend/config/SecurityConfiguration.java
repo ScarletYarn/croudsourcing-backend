@@ -71,7 +71,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
   protected void configure(HttpSecurity http) throws Exception {
     http.authorizeRequests(authorizeRequests ->
       authorizeRequests
-          .antMatchers("/login", "/user/signup", "/job/insert", "/payment/insert").permitAll()
+          .antMatchers("/", "/login", "/user/signup").permitAll()
           .antMatchers("/**").authenticated()
     )
             .formLogin()
@@ -117,11 +117,17 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
   @Override
   public void configure(WebSecurity web) throws Exception {
-    web.ignoring().antMatchers( "/swagger-ui.html",
+    web.ignoring().antMatchers(
+        "/swagger-ui.html",
         "/swagger-ui/*",
         "/swagger-resources/**",
         "/v2/api-docs",
         "/v3/api-docs",
-        "/webjars/**");
+        "/webjars/**",
+        "/fonts/**",
+        "/img/**",
+        "/js/**",
+        "/favicon.ico"
+    );
   }
 }
