@@ -103,8 +103,10 @@ public class UserController {
       @RequestParam String age,
       @RequestParam String gender,
       @RequestParam String kg,
+      @RequestParam String logic,
       @RequestParam String education,
-      @RequestParam List<String> rating
+      @RequestParam List<String> rating,
+      @RequestParam List<Boolean> cognitionStyle
   ) {
     String userId = userDetailUtil.getUserDetail().getId();
     Questionnaire q = new Questionnaire();
@@ -113,8 +115,10 @@ public class UserController {
     q.setAge(age);
     q.setGender(gender);
     q.setKg(kg);
+    q.setLogic(logic);
     q.setEducation(education);
     q.setRatings(rating);
+    q.setCognitionStyle(cognitionStyle);
     questionnaireRepo.save(q);
     return responseUtil.success();
   }

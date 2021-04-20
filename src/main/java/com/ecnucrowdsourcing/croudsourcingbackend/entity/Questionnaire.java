@@ -27,5 +27,9 @@ public class Questionnaire {
 
   private String kg;
 
+  private String logic;
+
   private List<String> ratings;
+
+  private List<Boolean> cognitionStyle;
 }

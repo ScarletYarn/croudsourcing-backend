@@ -21,7 +21,9 @@ public class RatingSheet {
 
   private String prevRuleId;
 
-  private String comment;
+  private String bcomment;
+
+  private String wcomment;
 
   private String best;
 

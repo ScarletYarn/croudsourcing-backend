@@ -33,8 +33,9 @@ public class RatingSheetController {
       @RequestParam String prevRuleId,
       @RequestParam String best,
       @RequestParam String worst,
-      @RequestParam(required = false) String comment
-  ) {
+      @RequestParam String bcomment,
+      @RequestParam String wcomment
+  ) throws Exception {
     String userId = userDetailUtil.getUserDetail().getId();
     RatingSheet ratingSheet = new RatingSheet();
     ratingSheet.setUserId(userId);
@@ -43,7 +44,8 @@ public class RatingSheetController {
     ratingSheet.setPrevRuleId(prevRuleId);
     ratingSheet.setBest(ExpType.valueOf(best).name());
     ratingSheet.setWorst(ExpType.valueOf(worst).name());
-    ratingSheet.setComment(comment != null ? comment : "");
+    ratingSheet.setBcomment(bcomment);
+    ratingSheet.setWcomment(wcomment);
     ratingSheetRepo.save(ratingSheet);
     return responseUtil.success();
   }
