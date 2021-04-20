@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface RuleDataRepo extends ElasticsearchRepository<RuleData, String> {
 
-  List<RuleData> findAllByJobId(String jobId);
+  List<RuleData> findAllByJobIdOrderBySeqAsc(String jobId);
 
   Optional<RuleData> findById(String id);
 }

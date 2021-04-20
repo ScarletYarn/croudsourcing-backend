@@ -24,7 +24,7 @@ public class RuleDataController {
   @ApiOperation("Get the list of rule data by job id")
   Response<List<String>> getByJob(@RequestParam String jobId) {
     return new Response<>(null, new ArrayList<>(){{
-      ruleDataRepo.findAllByJobId(jobId).forEach(e -> add(e.getId()));
+      ruleDataRepo.findAllByJobIdOrderBySeqAsc(jobId).forEach(e -> add(e.getId()));
     }});
   }
 

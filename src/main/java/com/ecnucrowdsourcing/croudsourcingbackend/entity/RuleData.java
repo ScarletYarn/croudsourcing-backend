@@ -15,6 +15,8 @@ public class RuleData {
 
   private String jobId;
 
+  private Integer seq;
+
   private String content;
 
   private String graph;
