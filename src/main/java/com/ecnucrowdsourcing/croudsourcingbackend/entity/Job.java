@@ -15,6 +15,8 @@ public class Job {
     @Id
     private String id;
 
+    private Integer seq;
+
     private String name;
 
     private Date publishDate;

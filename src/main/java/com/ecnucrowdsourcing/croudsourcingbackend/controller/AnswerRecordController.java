@@ -63,7 +63,7 @@ public class AnswerRecordController {
   @GetMapping("/result")
   Response<List<AnswerResult>> result(@RequestParam String jobId) {
     String userId = userDetailUtil.getUserDetail().getId();
-    List<RuleData> ruleDataList = ruleDataRepo.findAllByJobId(jobId);
+    List<RuleData> ruleDataList = ruleDataRepo.findAllByJobIdOrderBySeqAsc(jobId);
     List<AnswerRecord> answerRecordList = answerRecordRepo.findAllByJobIdAndUserId(jobId, userId);
     List<AnswerResult> answerResultList = new ArrayList<>();
     for (RuleData ruleData : ruleDataList) {

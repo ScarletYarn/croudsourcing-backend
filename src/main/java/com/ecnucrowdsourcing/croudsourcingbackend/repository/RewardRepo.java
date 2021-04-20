@@ -8,4 +8,6 @@ import java.util.List;
 public interface RewardRepo extends ElasticsearchRepository<Reward, String> {
 
     List<Reward> findAllByUserId(String userId);
+
+    List<Reward> findAllByUserIdAndJobId(String userId, String jobId);
 }
