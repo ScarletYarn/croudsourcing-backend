@@ -32,4 +32,6 @@ public class Questionnaire {
   private List<String> ratings;
 
   private List<Boolean> cognitionStyle;
+
+  private String field;
 }

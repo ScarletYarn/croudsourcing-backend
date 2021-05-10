@@ -11,4 +11,6 @@ public interface RuleDataRepo extends ElasticsearchRepository<RuleData, String> 
   List<RuleData> findAllByJobIdOrderBySeqAsc(String jobId);
 
   Optional<RuleData> findById(String id);
+
+  Optional<RuleData> findByJobIdAndSeq(String jobId, Integer seq);
 }

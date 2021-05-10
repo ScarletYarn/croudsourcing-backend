@@ -1,6 +1,5 @@
 package com.ecnucrowdsourcing.croudsourcingbackend.controller;
 
-import com.ecnucrowdsourcing.croudsourcingbackend.config.SecurityUserDetail;
 import com.ecnucrowdsourcing.croudsourcingbackend.entity.Reward;
 import com.ecnucrowdsourcing.croudsourcingbackend.entity.constant.RewardStatus;
 import com.ecnucrowdsourcing.croudsourcingbackend.repository.RewardRepo;
@@ -8,8 +7,6 @@ import com.ecnucrowdsourcing.croudsourcingbackend.util.Response;
 import com.ecnucrowdsourcing.croudsourcingbackend.util.ResponseUtil;
 import com.ecnucrowdsourcing.croudsourcingbackend.util.UserDetailUtil;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;

@@ -1,7 +1,6 @@
 package com.ecnucrowdsourcing.croudsourcingbackend.controller;
 
 import com.ecnucrowdsourcing.croudsourcingbackend.config.SecurityConfiguration;
-import com.ecnucrowdsourcing.croudsourcingbackend.config.SecurityUserDetail;
 import com.ecnucrowdsourcing.croudsourcingbackend.entity.MyUser;
 import com.ecnucrowdsourcing.croudsourcingbackend.entity.Questionnaire;
 import com.ecnucrowdsourcing.croudsourcingbackend.repository.MyUserRepo;
@@ -10,8 +9,6 @@ import com.ecnucrowdsourcing.croudsourcingbackend.util.Response;
 import com.ecnucrowdsourcing.croudsourcingbackend.util.ResponseUtil;
 import com.ecnucrowdsourcing.croudsourcingbackend.util.UserDetailUtil;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +16,7 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/user")
@@ -106,9 +104,12 @@ public class UserController {
       @RequestParam String logic,
       @RequestParam String education,
       @RequestParam List<String> rating,
-      @RequestParam List<Boolean> cognitionStyle
+      @RequestParam List<Boolean> cognitionStyle,
+      @RequestParam String field
   ) {
     String userId = userDetailUtil.getUserDetail().getId();
+    Optional<Questionnaire> questionnaireOptional = questionnaireRepo.findByUserId(userId);
+    if (questionnaireOptional.isPresent()) return responseUtil.success();
     Questionnaire q = new Questionnaire();
     q.setUserId(userId);
     q.setName(name);
@@ -119,6 +120,7 @@ public class UserController {
     q.setEducation(education);
     q.setRatings(rating);
     q.setCognitionStyle(cognitionStyle);
+    q.setField(field);
     questionnaireRepo.save(q);
     return responseUtil.success();
   }
