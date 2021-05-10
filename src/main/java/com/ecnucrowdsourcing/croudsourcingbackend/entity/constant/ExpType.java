@@ -1,5 +1,5 @@
 package com.ecnucrowdsourcing.croudsourcingbackend.entity.constant;
 
 public enum ExpType {
-  INS, NL, KG
+  INS, NL, KG, NO
 }

@@ -3,16 +3,15 @@ package com.ecnucrowdsourcing.croudsourcingbackend.controller;
 import com.ecnucrowdsourcing.croudsourcingbackend.entity.RatingSheet;
 import com.ecnucrowdsourcing.croudsourcingbackend.entity.constant.ExpType;
 import com.ecnucrowdsourcing.croudsourcingbackend.repository.RatingSheetRepo;
+import com.ecnucrowdsourcing.croudsourcingbackend.repository.RuleDataRepo;
 import com.ecnucrowdsourcing.croudsourcingbackend.util.Response;
 import com.ecnucrowdsourcing.croudsourcingbackend.util.ResponseUtil;
 import com.ecnucrowdsourcing.croudsourcingbackend.util.UserDetailUtil;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/ratingSheet")
@@ -20,6 +19,9 @@ public class RatingSheetController {
 
   @Resource
   private RatingSheetRepo ratingSheetRepo;
+
+  @Resource
+  private RuleDataRepo ruleDataRepo;
 
   @Resource
   private UserDetailUtil userDetailUtil;
@@ -33,8 +35,8 @@ public class RatingSheetController {
       @RequestParam String prevRuleId,
       @RequestParam String best,
       @RequestParam String worst,
-      @RequestParam String bcomment,
-      @RequestParam String wcomment
+      @RequestParam(required = false) String bcomment,
+      @RequestParam(required = false) String wcomment
   ) throws Exception {
     String userId = userDetailUtil.getUserDetail().getId();
     RatingSheet ratingSheet = new RatingSheet();
@@ -48,5 +50,19 @@ public class RatingSheetController {
     ratingSheet.setWcomment(wcomment);
     ratingSheetRepo.save(ratingSheet);
     return responseUtil.success();
+  }
+
+  @GetMapping("/isComplete")
+  Response<Boolean> isComplete(
+      @RequestParam String jobId,
+      @RequestParam Integer prevIndex
+  ) {
+    String userId = userDetailUtil.getUserDetail().getId();
+    String prevRuleId = ruleDataRepo.findByJobIdAndSeq(jobId, prevIndex).get().getId();
+    Optional<RatingSheet> ratingSheetOptional = ratingSheetRepo.findByJobIdAndUserIdAndPrevRuleId(
+        jobId, userId, prevRuleId
+    );
+    if (ratingSheetOptional.isPresent()) return responseUtil.success();
+    else return responseUtil.fail(null);
   }
 }

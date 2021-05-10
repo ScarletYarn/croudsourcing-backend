@@ -1,9 +1,11 @@
 package com.ecnucrowdsourcing.croudsourcingbackend.controller;
 
 import com.ecnucrowdsourcing.croudsourcingbackend.entity.Job;
+import com.ecnucrowdsourcing.croudsourcingbackend.entity.JobStatus;
 import com.ecnucrowdsourcing.croudsourcingbackend.entity.Reward;
 import com.ecnucrowdsourcing.croudsourcingbackend.entity.constant.RewardStatus;
 import com.ecnucrowdsourcing.croudsourcingbackend.repository.JobRepo;
+import com.ecnucrowdsourcing.croudsourcingbackend.repository.JobStatusRepo;
 import com.ecnucrowdsourcing.croudsourcingbackend.repository.RewardRepo;
 import com.ecnucrowdsourcing.croudsourcingbackend.util.Response;
 import com.ecnucrowdsourcing.croudsourcingbackend.util.ResponseUtil;
@@ -25,6 +27,9 @@ public class JobController {
 
   @Resource
   private RewardRepo rewardRepo;
+
+  @Resource
+  private JobStatusRepo jobStatusRepo;
 
   @Resource
   private ResponseUtil responseUtil;
@@ -77,5 +82,12 @@ public class JobController {
     job.setReward(10000);
     jobRepo.save(job);
     return responseUtil.success();
+  }
+
+  @GetMapping("/currentIndex")
+  Response<Integer> currentIndex(@RequestParam String jobId) {
+    String userId = userDetailUtil.getUserDetail().getId();
+    Optional<JobStatus> jobStatusOptional = jobStatusRepo.findByJobIdAndUserId(jobId, userId);
+    return jobStatusOptional.map(jobStatus -> new Response<>(null, jobStatus.getCurrentIndex())).orElseGet(() -> new Response<>(null, -1));
   }
 }

@@ -1,10 +1,12 @@
 package com.ecnucrowdsourcing.croudsourcingbackend.controller;
 
 import com.ecnucrowdsourcing.croudsourcingbackend.entity.AnswerRecord;
+import com.ecnucrowdsourcing.croudsourcingbackend.entity.JobStatus;
 import com.ecnucrowdsourcing.croudsourcingbackend.entity.RuleData;
 import com.ecnucrowdsourcing.croudsourcingbackend.entity.constant.Answer;
 import com.ecnucrowdsourcing.croudsourcingbackend.entity.dto.AnswerResult;
 import com.ecnucrowdsourcing.croudsourcingbackend.repository.AnswerRecordRepo;
+import com.ecnucrowdsourcing.croudsourcingbackend.repository.JobStatusRepo;
 import com.ecnucrowdsourcing.croudsourcingbackend.repository.RuleDataRepo;
 import com.ecnucrowdsourcing.croudsourcingbackend.util.Response;
 import com.ecnucrowdsourcing.croudsourcingbackend.util.ResponseUtil;
@@ -16,6 +18,7 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/answerRecord")
@@ -29,6 +32,9 @@ public class AnswerRecordController {
 
   @Resource
   private RuleDataRepo ruleDataRepo;
+
+  @Resource
+  private JobStatusRepo jobStatusRepo;
 
   @Resource
   private UserDetailUtil userDetailUtil;
@@ -45,6 +51,11 @@ public class AnswerRecordController {
       @RequestParam Integer instanceScore
   ) {
     String userId = userDetailUtil.getUserDetail().getId();
+
+    Optional<AnswerRecord> answerRecordOptional = answerRecordRepo
+        .findByJobIdAndRuleDataIdAndUserId(jobId, ruleDataId, userId);
+    if (answerRecordOptional.isPresent()) return responseUtil.success();
+
     AnswerRecord answerRecord = new AnswerRecord();
     answerRecord.setUserId(userId);
     answerRecord.setJobId(jobId);
@@ -56,6 +67,16 @@ public class AnswerRecordController {
     answerRecord.setNlScore(nlScore);
     answerRecord.setInstanceScore(instanceScore);
     answerRecordRepo.save(answerRecord);
+
+    JobStatus jobStatus = new JobStatus();
+    Optional<JobStatus> jobStatusOptional = jobStatusRepo.findByJobIdAndUserId(jobId, userId);
+    RuleData ruleData = ruleDataRepo.findById(ruleDataId).get();
+    jobStatusOptional.ifPresent(jobStatus1 -> jobStatus.setId(jobStatus1.getId()));
+    jobStatus.setJobId(jobId);
+    jobStatus.setUserId(userId);
+    jobStatus.setCurrentIndex(ruleData.getSeq());
+    jobStatusRepo.save(jobStatus);
+
     return responseUtil.success();
   }
 

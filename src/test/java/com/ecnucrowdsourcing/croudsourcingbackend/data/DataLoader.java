@@ -44,6 +44,9 @@ public class DataLoader {
   private UserActionRepo userActionRepo;
 
   @Resource
+  private JobStatusRepo jobStatusRepo;
+
+  @Resource
   private TestUtility testUtility;
 
   @Test
@@ -54,7 +57,7 @@ public class DataLoader {
       MyUser myUser = new MyUser();
       myUser.setUsername(jsonObject.getString("username"));
       myUser.setPhone(jsonObject.getString("phone"));
-      myUser.setAlipay(jsonObject.getString("aliPay"));
+      myUser.setAlipay(jsonObject.getString("alipay"));
       myUser.setPassword(new BCryptPasswordEncoder().encode(jsonObject.getString("password")));
       myUser.setRoles(Arrays.asList(jsonObject.getString("roles").split(",")));
       myUser.setSignupDate(new Date(jsonObject.getLong("signupDate")));
@@ -64,12 +67,14 @@ public class DataLoader {
 
   @Test
   void loadJob() throws Exception {
-    JSONArray jsonArray = testUtility.readJSON("/job.json");for (int i = 0; i < jsonArray.length(); i++) {
+    JSONArray jsonArray = testUtility.readJSON("/job.json");
+    for (int i = 0; i < jsonArray.length(); i++) {
       JSONObject jsonObject = jsonArray.getJSONObject(i);
       Job job = new Job();
       job.setName(jsonObject.getString("name"));
       job.setReward(jsonObject.getInt("reward"));
       job.setDesc(jsonObject.getString("desc"));
+      job.setSeq(jsonObject.getInt("seq"));
       job.setPublishDate(new Date(jsonObject.getLong("publishDate")));
       jobRepo.save(job);
     }
@@ -88,6 +93,7 @@ public class DataLoader {
       ruleData.setInstance(jsonObject.getString("instance"));
       ruleData.setGraph(jsonObject.getString("graph"));
       ruleData.setJobId(jobId);
+      ruleData.setSeq(jsonObject.getInt("seq"));
       ruleData.setDifficulty(jsonObject.getInt("difficulty"));
       ruleDataRepo.save(ruleData);
     }
