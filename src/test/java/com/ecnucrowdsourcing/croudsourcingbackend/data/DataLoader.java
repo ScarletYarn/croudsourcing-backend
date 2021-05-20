@@ -10,8 +10,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import javax.annotation.Resource;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 @SpringBootTest
 public class DataLoader {
@@ -45,6 +48,9 @@ public class DataLoader {
 
   @Resource
   private JobStatusRepo jobStatusRepo;
+
+  @Resource
+  private RuleRepo ruleRepo;
 
   @Resource
   private TestUtility testUtility;
@@ -98,4 +104,23 @@ public class DataLoader {
       ruleDataRepo.save(ruleData);
     }
   }
+
+//  @Test
+//  void loadRule() throws Exception {
+//    InputStream inputStream = TestUtility.class.getResourceAsStream("/pre.txt");
+//    int size=inputStream.available();
+//    byte[] buffer=new byte[size];
+//    inputStream.read(buffer);
+//    inputStream.close();
+//    String s = new String(buffer, StandardCharsets.UTF_8);
+//    List<String> tuples = Arrays.asList(s.split("\n"));
+//    int index = 0;
+//    for (String item : tuples) {
+//      Rule rule = new Rule();
+//      rule.setBody(item);
+//      rule.setSeq(index);
+//      index++;
+//      ruleRepo.save(rule);
+//    }
+//  }
 }

@@ -49,6 +49,35 @@ Some [resources](https://www.pair.com/support/kb/paircloud-downloading-files-wit
 curl -o <filename> <url>
 ```
 
+- Export data using Kibana
+
+Go to Stack Management/Index patterns/Create index pattern, create an index pattern for it, then go to discover, find the index pattern
+
+<img src="C:\Users\wuping\AppData\Roaming\Typora\typora-user-images\image-20210330171811802.png" alt="image-20210330171811802" style="zoom:50%;" />
+
+Click share, generate CSV file. You can find the outcome in Stack Management/Reporting.
+
+- Get filed name and value using reflection
+
+```java
+Field[] declaredFields = clazz.getDeclaredFields();
+field.getName();
+field.setVisible(true); // For private field
+field.get(object);
+```
+
+- Concatenate file name
+
+```java
+String.valueOf(Paths.get("foo", "bar"));
+```
+
+- Generic method
+
+```java
+public <T> void method(List<T> clazz) {}
+```
+
 # Bugs
 
 - Documents inserted using cURL cannot be retrieved 
