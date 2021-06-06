@@ -39,6 +39,9 @@ public class DataClean {
   @Resource
   private JobStatusRepo jobStatusRepo;
 
+  @Resource
+  private TestEntityRepo testEntityRepo;
+
   @Test
   void clearAnswerRecord() throws Exception {
     answerRecordRepo.deleteAll();
@@ -87,5 +90,10 @@ public class DataClean {
   @Test
   void clearJobStatus() throws Exception {
     jobStatusRepo.deleteAll();
+  }
+
+  @Test
+  void clearTestEntity() throws Exception {
+    testEntityRepo.deleteAll();
   }
 }

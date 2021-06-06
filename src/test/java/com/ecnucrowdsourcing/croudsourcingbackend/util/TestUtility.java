@@ -19,6 +19,8 @@ public class TestUtility {
 
   public static final String DUMP_DIR = "D:/Datadump";
 
+  public static final String SEP = "\t";
+
   public JSONArray readJSON(String filename) throws Exception {
     InputStream inputStream = TestUtility.class.getResourceAsStream(filename);
     int size=inputStream.available();
@@ -35,7 +37,7 @@ public class TestUtility {
     for (int i = 0; i < fields.length; i++) fields[i] = declaredFields[i].getName();
     File file = new File(String.valueOf(Paths.get(TestUtility.DUMP_DIR, String.format("%s.csv", clazz.getSimpleName()))));
     BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-    bw.write(String.join(",", fields) + "\n");
+    bw.write(String.join(SEP, fields) + "\n");
     Iterable<T> items = repo.findAll();
     for (T item : items) {
       List<String> values = new ArrayList<>();
@@ -43,7 +45,7 @@ public class TestUtility {
         field.setAccessible(true);
         values.add(String.valueOf(field.get(item)));
       }
-      bw.write(String.join(",", values) + "\n");
+      bw.write(String.join(SEP, values) + "\n");
     }
     bw.close();
   }
