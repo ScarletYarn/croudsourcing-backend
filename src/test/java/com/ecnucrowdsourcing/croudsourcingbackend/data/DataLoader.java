@@ -50,9 +50,6 @@ public class DataLoader {
   private JobStatusRepo jobStatusRepo;
 
   @Resource
-  private RuleRepo ruleRepo;
-
-  @Resource
   private TestUtility testUtility;
 
   @Test
@@ -104,23 +101,4 @@ public class DataLoader {
       ruleDataRepo.save(ruleData);
     }
   }
-
-//  @Test
-//  void loadRule() throws Exception {
-//    InputStream inputStream = TestUtility.class.getResourceAsStream("/pre.txt");
-//    int size=inputStream.available();
-//    byte[] buffer=new byte[size];
-//    inputStream.read(buffer);
-//    inputStream.close();
-//    String s = new String(buffer, StandardCharsets.UTF_8);
-//    List<String> tuples = Arrays.asList(s.split("\n"));
-//    int index = 0;
-//    for (String item : tuples) {
-//      Rule rule = new Rule();
-//      rule.setBody(item);
-//      rule.setSeq(index);
-//      index++;
-//      ruleRepo.save(rule);
-//    }
-//  }
 }

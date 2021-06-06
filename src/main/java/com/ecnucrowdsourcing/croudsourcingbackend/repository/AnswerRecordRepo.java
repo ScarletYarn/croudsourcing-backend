@@ -11,4 +11,6 @@ public interface AnswerRecordRepo extends ElasticsearchRepository<AnswerRecord, 
   List<AnswerRecord> findAllByJobIdAndUserId(String jobId, String userId);
 
   Optional<AnswerRecord> findByJobIdAndRuleDataIdAndUserId(String jobId, String ruleDataId, String userId);
+
+  List<AnswerRecord> findAllByUserId(String userId);
 }
