@@ -4,10 +4,11 @@ import com.ecnucrowdsourcing.croudsourcingbackend.entity.Reward;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface RewardRepo extends ElasticsearchRepository<Reward, String> {
 
     List<Reward> findAllByUserId(String userId);
 
-    List<Reward> findAllByUserIdAndJobId(String userId, String jobId);
+    Optional<Reward> findByUserIdAndJobId(String userId, String jobId);
 }

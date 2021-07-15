@@ -62,8 +62,8 @@ public class JobController {
   @GetMapping("/isComplete")
   Response<Boolean> isComplete(@RequestParam String jobId) {
     String userId = userDetailUtil.getUserDetail().getId();
-    List<Reward> rewards = rewardRepo.findAllByUserIdAndJobId(userId, jobId);
-    return new Response<>(null, !rewards.isEmpty());
+    Optional<Reward> reward = rewardRepo.findByUserIdAndJobId(userId, jobId);
+    return new Response<>(null, reward.isPresent());
   }
 
   @ApiOperation("Query for details about a job")

@@ -105,7 +105,7 @@ public class UserController {
       @RequestParam String education,
       @RequestParam List<String> rating,
       @RequestParam List<Boolean> cognitionStyle,
-      @RequestParam String field
+      @RequestParam List<String> field
   ) {
     String userId = userDetailUtil.getUserDetail().getId();
     Optional<Questionnaire> questionnaireOptional = questionnaireRepo.findByUserId(userId);
