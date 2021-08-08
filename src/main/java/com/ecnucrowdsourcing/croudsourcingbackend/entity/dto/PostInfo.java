@@ -24,6 +24,10 @@ public class PostInfo {
 
   private Integer reward;
 
+  private Integer basic;
+
+  private Integer bonus;
+
   private List<Integer> characterRating;
 
   private Integer cognitionStyle;

@@ -60,6 +60,8 @@ public class ResultController {
     }
     Optional<Reward> rewardOptional = rewardRepo.findByUserIdAndJobId(id, "wyEJZnkBVvpk1kz1ir15");
     postInfo.setReward(rewardOptional.get().getValue());
+    postInfo.setBasic(rewardOptional.get().getBasic());
+    postInfo.setBonus(rewardOptional.get().getBonus());
     postInfo.setCorrectAmount(correctAmountMap.get(id));
     postInfo.setCompletionTime(rewardOptional.get().getCompleteTime());
     postInfo.setCorrectList(new ArrayList<>(){{

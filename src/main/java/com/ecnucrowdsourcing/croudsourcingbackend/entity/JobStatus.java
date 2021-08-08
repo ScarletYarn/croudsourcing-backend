@@ -2,6 +2,7 @@ package com.ecnucrowdsourcing.croudsourcingbackend.entity;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 
 @Document(indexName = "#{@IndexPrefixProvider.indexPrefix()}job_status")
@@ -9,6 +10,7 @@ import org.springframework.data.elasticsearch.annotations.Document;
 @Getter
 public class JobStatus {
 
+  @Id
   private String id;
 
   private String jobId;

@@ -8,6 +8,8 @@ import java.util.Optional;
 
 public interface RewardRepo extends ElasticsearchRepository<Reward, String> {
 
+    List<Reward> findAll();
+
     List<Reward> findAllByUserId(String userId);
 
     Optional<Reward> findByUserIdAndJobId(String userId, String jobId);
