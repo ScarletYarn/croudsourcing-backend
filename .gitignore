@@ -2,3 +2,4 @@
 build/
 .gradle/
 src/main/resources/static/
+src/main/java/com/ecnucrowdsourcing/croudsourcingbackend/service/thrift/

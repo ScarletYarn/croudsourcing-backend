@@ -29,6 +29,9 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 
+	// https://mvnrepository.com/artifact/org.apache.thrift/libthrift
+	implementation group: 'org.apache.thrift', name: 'libthrift', version: '0.12.0'
+
 	// https://mvnrepository.com/artifact/io.springfox/springfox-boot-starter
 	compile group: 'io.springfox', name: 'springfox-boot-starter', version: '3.0.0'
 }

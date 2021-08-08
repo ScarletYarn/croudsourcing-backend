@@ -78,6 +78,12 @@ String.valueOf(Paths.get("foo", "bar"));
 public <T> void method(List<T> clazz) {}
 ```
 
+- Read text file by line
+
+```java
+
+```
+
 # Bugs
 
 - Documents inserted using cURL cannot be retrieved 
