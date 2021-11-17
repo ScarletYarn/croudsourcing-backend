@@ -11,4 +11,6 @@ public interface JobRepo extends ElasticsearchRepository<Job, String> {
     List<Job> findAll();
 
     Optional<Job> findById(String jobId);
+
+    Optional<Job> findBySeq(Integer seq);
 }

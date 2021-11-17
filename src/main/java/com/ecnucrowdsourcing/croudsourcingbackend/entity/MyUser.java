@@ -1,7 +1,6 @@
 package com.ecnucrowdsourcing.croudsourcingbackend.entity;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.security.core.GrantedAuthority;
@@ -14,8 +13,7 @@ import java.util.Date;
 import java.util.List;
 
 @Document(indexName = "#{@IndexPrefixProvider.indexPrefix()}my_user")
-@Setter
-@Getter
+@Data
 public class MyUser implements UserDetails {
 
   @Id

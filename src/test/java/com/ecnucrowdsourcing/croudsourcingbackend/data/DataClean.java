@@ -1,99 +1,70 @@
 package com.ecnucrowdsourcing.croudsourcingbackend.data;
 
-import com.ecnucrowdsourcing.croudsourcingbackend.repository.*;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import javax.annotation.Resource;
-
+@Disabled
 @SpringBootTest
-public class DataClean {
-
-  @Resource
-  private AnswerRecordRepo answerRecordRepo;
-
-  @Resource
-  private AppealRepo appealRepo;
-
-  @Resource
-  private JobRepo jobRepo;
-
-  @Resource
-  private MyUserRepo myUserRepo;
-
-  @Resource
-  private QuestionnaireRepo questionnaireRepo;
-
-  @Resource
-  private RatingSheetRepo ratingSheetRepo;
-
-  @Resource
-  private RewardRepo rewardRepo;
-
-  @Resource
-  private RuleDataRepo ruleDataRepo;
-
-  @Resource
-  private UserActionRepo userActionRepo;
-
-  @Resource
-  private JobStatusRepo jobStatusRepo;
-
-  @Resource
-  private TestEntityRepo testEntityRepo;
+public class DataClean extends DataInjector {
 
   @Test
-  void clearAnswerRecord() throws Exception {
+  void clearAnswerRecord() {
     answerRecordRepo.deleteAll();
   }
 
   @Test
-  void clearAppeal() throws Exception {
+  void clearAppeal() {
     appealRepo.deleteAll();
   }
 
   @Test
-  void clearJob() throws Exception {
+  void clearJob() {
     jobRepo.deleteAll();
   }
 
   @Test
-  void clearMyUser() throws Exception {
+  void clearMyUser() {
     myUserRepo.deleteAll();
   }
 
   @Test
-  void clearQuestionnaire() throws Exception {
+  void clearQuestionnaire() {
     questionnaireRepo.deleteAll();
   }
 
   @Test
-  void clearRatingSheet() throws Exception {
+  void clearRatingSheet() {
     ratingSheetRepo.deleteAll();
   }
 
   @Test
-  void clearReward() throws Exception {
+  void clearReward() {
     rewardRepo.deleteAll();
   }
 
   @Test
-  void clearRuleData() throws Exception {
+  void clearRuleData() {
     ruleDataRepo.deleteAll();
   }
 
   @Test
-  void clearUserAction() throws Exception {
+  void clearUserAction() {
     userActionRepo.deleteAll();
   }
 
   @Test
-  void clearJobStatus() throws Exception {
+  void clearJobStatus() {
     jobStatusRepo.deleteAll();
   }
 
   @Test
-  void clearTestEntity() throws Exception {
+  void clearTestEntity() {
     testEntityRepo.deleteAll();
+  }
+
+  @Test
+  void clearExpSeq() {
+    expSeqRepo.deleteAll();
   }
 }

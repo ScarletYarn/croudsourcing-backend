@@ -13,4 +13,8 @@ public interface RewardRepo extends ElasticsearchRepository<Reward, String> {
     List<Reward> findAllByUserId(String userId);
 
     Optional<Reward> findByUserIdAndJobId(String userId, String jobId);
+
+    void deleteAllByJobId(String jobId);
+
+    void deleteAllByJobIdAndUserId(String jobId, String userId);
 }

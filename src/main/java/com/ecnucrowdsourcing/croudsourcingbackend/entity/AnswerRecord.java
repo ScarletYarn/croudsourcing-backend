@@ -1,14 +1,12 @@
 package com.ecnucrowdsourcing.croudsourcingbackend.entity;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 
 import java.util.Date;
 
-@Getter
-@Setter
+@Data
 @Document(indexName = "#{@IndexPrefixProvider.indexPrefix()}answer_record")
 public class AnswerRecord {
 

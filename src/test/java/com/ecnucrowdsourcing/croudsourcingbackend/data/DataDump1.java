@@ -24,8 +24,9 @@ import java.lang.reflect.Field;
 import java.nio.file.Paths;
 import java.util.*;
 
+@Disabled
 @SpringBootTest
-public class DataDump extends DataInjector {
+public class DataDump1 extends DataInjector {
 
   @Resource
   private RestHighLevelClient elasticsearchClient;
@@ -54,7 +55,7 @@ public class DataDump extends DataInjector {
 
   @Test
   void dumpAction() throws IOException {
-    Optional<Job> job = jobRepo.findBySeq(2);
+    Optional<Job> job = jobRepo.findBySeq(1);
     assert job.isPresent();
 
     Field[] declaredFields = UserAction.class.getDeclaredFields();
@@ -367,45 +368,5 @@ public class DataDump extends DataInjector {
       reward.get().setValue(parseRewardValue(items.get(3)));
       rewardRepo.save(reward.get());
     }
-  }
-
-  @Test
-  void dumpAnswersJob2() throws Exception {
-    File file = new File(String.valueOf(Paths.get(TestUtility.DUMP_DIR, "任务完成情况.csv")));
-    BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-    Iterable<MyUser> users = myUserRepo.findAll();
-    String[] fields = { "用户id", "规则id", "完成正误", "完成时间" };
-    bw.write(String.join(TestUtility.SEP, fields) + "\n");
-    Optional<Job> job = jobRepo.findBySeq(2);
-    assert job.isPresent();
-    for (MyUser user : users) {
-      List<AnswerRecord> records = answerRecordRepo.findAllByJobIdAndUserId(
-          job.get().getId(), user.getId()
-      );
-      if (records.size() < 20) continue;
-      System.out.println(user);
-      for (AnswerRecord answerRecord : records) {
-        List<String> values = new ArrayList<>();
-        values.add(user.getId());
-        values.add(answerRecord.getRuleDataId());
-        Optional<RuleData> ruleData = ruleDataRepo.findById(answerRecord.getRuleDataId());
-        assert ruleData.isPresent();
-        if (ruleData.get().getGoldenAnswer().equalsIgnoreCase(answerRecord.getAnswer())) values.add("正确");
-        else values.add("错误");
-        values.add(answerRecord.getDate().toString());
-        bw.write(String.join(TestUtility.SEP, values) + "\n");
-      }
-    }
-  }
-
-  @Test
-  void dumpUserAction2() throws Exception {
-    Optional<Job> job = jobRepo.findBySeq(2);
-    assert job.isPresent();
-    testUtility.dumpData(UserAction.class, userActionRepo, new TestUtility.Filter<UserAction>(){
-      boolean filter(UserAction action) {
-        return action.getJobId().equals(job.get().getId());
-      }
-    });
   }
 }

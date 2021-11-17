@@ -24,11 +24,21 @@ public class KBController {
 
   @GetMapping("/q")
   Response<String> search(@RequestParam String q) {
-    return new Response<String>(null, gstoreConnector.query("cskg", "json", q));
+    return new Response<>(null, gstoreConnector.query("cskg", "json", q));
   }
 
-  @GetMapping("/qa")
-  Response<List<Result>> qa(@RequestParam String q) {
-    return new Response<>(null, ckqaService.getResult(q));
+  @GetMapping("/qa/mask")
+  Response<List<Result>> qaMask(@RequestParam String q) {
+    return new Response<>(null, ckqaService.getMaskResult(q));
+  }
+
+  @GetMapping("/qa/span")
+  Response<List<Result>> qaSpan(@RequestParam String q) {
+    return new Response<>(null, ckqaService.getSpanResult(q));
+  }
+
+  @GetMapping("/qa/mask/word")
+  Response<List<Result>> qaMaskWord(@RequestParam String q) {
+    return new Response<>(null, ckqaService.getMaskWordResult(q));
   }
 }

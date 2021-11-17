@@ -15,7 +15,7 @@ import java.util.List;
 @Service("ckqaService")
 public class CKQAService {
 
-  public List<Result> getResult(String query) {
+  public List<Result> getMaskResult(String query) {
     List<Result> results = new ArrayList<>();
     try {
       TTransport transport;
@@ -24,7 +24,43 @@ public class CKQAService {
 
       TProtocol protocol = new TBinaryProtocol(transport);
       CKQA.Client client = new CKQA.Client(protocol);
-      results = client.getResult(query);
+      results = client.getMaskResult(query);
+      transport.close();
+    } catch (TException e) {
+      e.printStackTrace();
+    }
+
+    return results;
+  }
+
+  public List<Result> getSpanResult(String query) {
+    List<Result> results = new ArrayList<>();
+    try {
+      TTransport transport;
+      transport = new TSocket("192.168.10.162", 8327);
+      transport.open();
+
+      TProtocol protocol = new TBinaryProtocol(transport);
+      CKQA.Client client = new CKQA.Client(protocol);
+      results = client.getSpanResult(query);
+      transport.close();
+    } catch (TException e) {
+      e.printStackTrace();
+    }
+
+    return results;
+  }
+
+  public List<Result> getMaskWordResult(String query) {
+    List<Result> results = new ArrayList<>();
+    try {
+      TTransport transport;
+      transport = new TSocket("192.168.10.162", 8327);
+      transport.open();
+
+      TProtocol protocol = new TBinaryProtocol(transport);
+      CKQA.Client client = new CKQA.Client(protocol);
+      results = client.getMaskWordResult(query);
       transport.close();
     } catch (TException e) {
       e.printStackTrace();
