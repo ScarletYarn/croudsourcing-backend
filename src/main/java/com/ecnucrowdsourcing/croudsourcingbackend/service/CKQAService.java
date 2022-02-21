@@ -19,7 +19,7 @@ public class CKQAService {
     List<Result> results = new ArrayList<>();
     try {
       TTransport transport;
-      transport = new TSocket("192.168.10.162", 8327);
+      transport = new TSocket("localhost", 8327);
       transport.open();
 
       TProtocol protocol = new TBinaryProtocol(transport);
@@ -37,7 +37,7 @@ public class CKQAService {
     List<Result> results = new ArrayList<>();
     try {
       TTransport transport;
-      transport = new TSocket("192.168.10.162", 8327);
+      transport = new TSocket("localhost", 8327);
       transport.open();
 
       TProtocol protocol = new TBinaryProtocol(transport);
@@ -55,7 +55,7 @@ public class CKQAService {
     List<Result> results = new ArrayList<>();
     try {
       TTransport transport;
-      transport = new TSocket("192.168.10.162", 8327);
+      transport = new TSocket("localhost", 8327);
       transport.open();
 
       TProtocol protocol = new TBinaryProtocol(transport);
