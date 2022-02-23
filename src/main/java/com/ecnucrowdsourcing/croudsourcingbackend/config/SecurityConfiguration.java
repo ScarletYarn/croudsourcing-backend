@@ -59,7 +59,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
     configuration.setAllowedHeaders(List.of("*"));
-    configuration.setAllowedOriginPatterns(List.of("http://localhost:3000"));
+    //configuration.setAllowedOriginPatterns(List.of("http://localhost:3000"));
+    configuration.setAllowedOriginPatterns(List.of("*"));
     configuration.setAllowedMethods(List.of("*"));
     configuration.setAllowCredentials(true);
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -71,7 +72,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
   protected void configure(HttpSecurity http) throws Exception {
     http.authorizeRequests(authorizeRequests ->
       authorizeRequests
-          .antMatchers("/", "/login", "/user/signup", "/test/**", "/kb/**", "/result/**").permitAll()
+          .antMatchers("/", "/login", "/user/signup", "/test/**", "/kb/**", "/result/**", "/images/**").permitAll()
           .antMatchers("/**").authenticated()
     )
             .formLogin()
@@ -112,7 +113,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     /* If csrf protection is enabled, request method will be limited without the token
      * If requests don't come from browser, http 403 will occur */
     if (indexPrefixProvider.profile.equals("dev")) http.csrf().disable();
-    else http.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
+    else http.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());	
+
+    /*http.authorizeRequests()
+            .anyRequest().permitAll().and().logout().permitAll();*/
+
   }
 
   @Override

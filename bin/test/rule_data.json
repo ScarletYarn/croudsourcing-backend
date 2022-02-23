@@ -1,0 +1,202 @@
+[
+  {
+    "jodId": " ",
+    "content": "所有者(B, A) => 子公司(A, B)",
+    "graph": "/img/1.svg",
+    "nl": "B的所有者是A，那么得出A的子公司是B。",
+    "instance": "所有者(Helm_Bank, Corpbanca) => 子公司(Corpbanca, Helm_Bank)",
+    "goldenAnswer": "TRUE",
+    "difficulty": "0",
+    "seq": "1"
+  },
+  {
+    "jodId": " ",
+    "content": "是……的公民(A,B) => 国籍(A,B)",
+    "graph": "/img/2.svg",
+    "nl": "A是B的公民，那么得出A的国籍是B。",
+    "instance": "是……的公民(Chen_Jianqiang, China) => 国籍(Chen_Jianqiang, China)",
+    "goldenAnswer": "TRUE",
+    "difficulty": "0",
+    "seq": "2"
+  },
+  {
+    "jodId": " ",
+    "content": "配偶(A,B)=> not 继承者(A,B)",
+    "graph": "/img/3.svg",
+    "nl": "A的配偶是B，那么得出A的继承者不是B。",
+    "instance": "配偶(Jiaqing_Emperor, Empress_Xiaokangzhang)=> not 继承者(Jiaqing_Emperor, Empress_Xiaokangzhang)",
+    "goldenAnswer": "FALSE",
+    "difficulty": "0",
+    "seq": "3"
+  },
+  {
+    "jodId": " ",
+    "content": "位置(A,v0) &  所属国家(v0,B) => 位置（国家）(A,B)",
+    "graph": "/img/4.svg",
+    "nl": "A的位置是v0，v0的所属国家是B，那么得出A的位置（国家）是B。",
+    "instance": "位置(KABB,Texas) &  所属国家(Texas,United_States) => 位置（国家）(KABB,United_States)",
+    "goldenAnswer": "TRUE",
+    "difficulty": "1",
+    "seq": "4"
+  },
+  {
+    "jodId": " ",
+    "content": "孩子(v0, A) & 是……的公民 (v0, B)  => 公民 (A, B)",
+    "graph": "/img/5.svg",
+    "nl": "v0的孩子是A，v0是B的公民，那么得出A是B的公民",
+    "instance": "孩子(George_Mason_II, George_Mason_III) & 是……的公民 (George_Mason_II, United_States)  => 公民 (George_Mason_III, United_States)",
+    "goldenAnswer": "TRUE",
+    "difficulty": "0",
+    "seq": "5"
+  },
+  {
+    "jodId": " ",
+    "content": "亲戚(A,v0) & 孩子(v1,v0) & 配偶(v1,B) => 亲戚(A,B)",
+    "graph": "/img/6.svg",
+    "nl": "A的亲戚是v0，v1的孩子是v0，v1的配偶是B，那么得出A的亲戚是B。",
+    "instance": "亲戚(David_Nelson_(actor),Gunnar_Nelson_(musician)) & 孩子(Kristin_Nelson,Gunnar_Nelson_(musician)) & 配偶(Kristin_Nelson,Ricky_Nelson) => 亲戚(David_Nelson_(actor),Ricky_Nelson)",
+    "goldenAnswer": "TRUE",
+    "difficulty": "5",
+    "seq": "6"
+  },
+  {
+    "jodId": " ",
+    "content": "系列(A,v0) & 系列(v1,v0) & 杰出作品(B,v1) =>作者(A,B)",
+    "graph": "/img/7.svg",
+    "nl": "A的系列是v0，v1的系列是v0，B的杰出作品是v1，那么得出A的作者是B。",
+    "instance": "系列(The_Poison_Belt,Professor_Challenger) & 系列(The_Lost_World_(Conan_Doyle_novel),Professor_Challenger) & 杰出作品(Arthur_Conan_Doyle,The_Lost_World_(Conan_Doyle_novel)) =>作者(The_Poison_Belt,Arthur_Conan_Doyle)",
+    "goldenAnswer": "TRUE",
+    "difficulty": "5",
+    "seq": "7"
+  },
+  {
+    "jodId": " ",
+    "content": "是……的变体(A,v0) & 是……的变体(v1,v0) & 制造商(v1,B) => 制造商(A,B)",
+    "graph": "/img/8.svg",
+    "nl": "A是v0的变体，v1是v0的变体，v1的制造商是B，那么得出A的制造商是B。",
+    "instance": "是……的变体(Hino_Briska__FG_series__1,Hino_Briska) & 是……的变体(Hino_Briska__FG_series__1,Hino_Briska) & 制造商(Hino_Briska__FG_series__1,Hino_Motors) => 制造商(Hino_Briska__FG_series__1,Hino_Motors)",
+    "goldenAnswer": "FALSE",
+    "difficulty": "5",
+    "seq": "8"
+  },
+  {
+    "jodId": " ",
+    "content": "作者(A,v0) & 作曲者 (v1,v0) & 作者(v1,B) => 作者(A,B)",
+    "graph": "/img/9.svg",
+    "nl": "A的作者是v0，v1的作曲者是v0，v1的作者是B，那么得出A的作者是B。",
+    "instance": "作者(Oye_Como_Va,Tito_Puente) & 作曲者 (Oye_Como_Va,Tito_Puente) & 作者(Oye_Como_Va,Tito_Puente) => 作者(Oye_Como_Va,Tito_Puente)",
+    "goldenAnswer": "FALSE",
+    "difficulty": "5",
+    "seq": "9"
+  },
+  {
+    "jodId": "",
+    "content": "开发者(A,v0) & 产品(v0,v1) & 设计者(v1,B) =>设计者(A,B)",
+    "graph": "/img/10.svg",
+    "nl": "A的开发者是v0，v0的产品是v1，v1的设计者是B，那么得出A的设计者是B。",
+    "instance": "开发者(Virtua_Cop,Sega_AM2) & 产品(Sega_AM2,Virtua_Cop) & 设计者(Virtua_Cop,Yu_Suzuki) =>设计者(Virtua_Cop,Yu_Suzuki)",
+    "goldenAnswer": "FALSE",
+    "difficulty": "6",
+    "seq": "10"
+  },
+  {
+    "jodId": "",
+    "content": "继承人(A, v0) & 有……的管辖权(v0, B)=> 有……的管辖权(A, B)",
+    "graph": "/img/11.svg",
+    "nl": "A的继承人是v0，v0有B的管辖权，那么得出A有B的管辖权。",
+    "instance": "继承人(LinkWater, Seqwater) & 有……的管辖权(Seqwater, South_East_Queensland)=> 有……的管辖权(LinkWater, South_East_Queensland)",
+    "goldenAnswer": "FALSE",
+    "difficulty": "3",
+    "seq": "11"
+  },
+  {
+    "jodId": "",
+    "content": "填词人(A,B) & 作曲人(A,B) => 作者(A,B)",
+    "graph": "/img/12.svg",
+    "nl": "A的填词人是B，A的作曲人是B，那么得出A的作者是B。",
+    "instance": "填词人(You'll_Be_Back_(song),Lin-Manuel_Miranda) & 作曲人(You'll_Be_Back_(song),Lin-Manuel_Miranda) => 作者(You'll_Be_Back_(song),Lin-Manuel_Miranda)",
+    "goldenAnswer": "TRUE",
+    "difficulty": "2",
+    "seq": "12"
+  },
+  {
+    "jodId": "",
+    "content": "配偶(A,B) => not 父母(A,B)",
+    "graph": "/img/13.svg",
+    "nl": "A的配偶是B，那么得出A的父母不是B。",
+    "instance": "配偶(Yongzheng_Emperor,Empress_Xiaojingxian) => not 父母(Yongzheng_Emperor,Empress_Xiaojingxian)",
+    "goldenAnswer": "TRUE",
+    "difficulty": "0",
+    "seq": "13"
+  },
+  {
+    "jodId": "",
+    "content": "主演(A,B) => not 导演(A,B)",
+    "graph": "/img/14.svg",
+    "nl": "A的主演是B，那么得出A的导演不是B。",
+    "instance": "主演(Return_of_Judge_Bao, Zhang_Tielin) => not  导演(Return_of_Judge_Bao,Zhang_Tielin)",
+    "goldenAnswer": "TRUE",
+    "difficulty": "0",
+    "seq": "14"
+  },
+  {
+    "jodId": "",
+    "content": "是……杰出的学生(B,A) => 学业导师(A,B)",
+    "graph": "/img/15.svg",
+    "nl": "B是A杰出的学生，那么得出A的学业导师是B。",
+    "instance": "杰出学生(Richard_Axel, Richard_Scheller) => 学业导师(Richard_Scheller, Richard_Axel)",
+    "goldenAnswer": "TRUE",
+    "difficulty": "0",
+    "seq": "15"
+  },
+  {
+    "jodId": "",
+    "content": "出版者(A,v0) & 开发者(v1,v0) & 设计者(v1,B) =>设计者(A,B)",
+    "graph": "/img/16.svg",
+    "nl": "A的出版者是v0，v1的开发者是v0，v1的设计者是B，那么得出A的设计者是B。",
+    "instance": "出版者(SimCity_(1989_video_game),Maxis) & 开发者(SimCity_(1989_video_game),Maxis) & 设计者(SimCity_(1989_video_game),Will_Wright_(game_designer)) =>设计者(SimCity_(1989_video_game),Will_Wright_(game_designer))",
+    "goldenAnswer": "FALSE",
+    "difficulty": "6",
+    "seq": "16"
+  },
+  {
+    "jodId": "",
+    "content": "州(A,v1) & 州(v0,v1) & 最大的城市(B,v0)  => 地区(A,B)",
+    "graph": "/img/17.svg",
+    "nl": "A的州是v1，v0的州是v1，B的最大的城市是v0，那么得出A的地区是B。",
+    "instance": "州(Fort_Necessity_National_Battlefield,Pennsylvania) & 州(Uniontown,_Pennsylvania,Pennsylvania) & 最大的城市(Fayette_County,_Pennsylvania,Uniontown,_Pennsylvania)  => 地区(Fort_Necessity_National_Battlefield,Fayette_County,_Pennsylvania)",
+    "goldenAnswer": "TRUE",
+    "difficulty": "6",
+    "seq": "17"
+  },
+  {
+    "jodId": "",
+    "content": "缔造者(A,v0) & 唱片公司(v0,v1) & 行业(v1,B) => 行业(A,B)",
+    "graph": "/img/18.svg",
+    "nl": "A的缔造者是v0，v0的唱片公司是v1，v1的行业是B，那么得出A的行业是B。",
+    "instance": "缔造者(Bassivity_Music,Oneya) & 唱片公司(Oneya,Bassivity_Music) & 行业(Bassivity_Music,Music_industry) => 行业(Bassivity_Music,Music_industry)",
+    "goldenAnswer": "FALSE",
+    "difficulty": "7",
+    "seq": "18"
+  },
+  {
+    "jodId": "",
+    "content": "作者(A,v0) & 创造者(v1,v0) & 作曲者(v1,B) =>not 作曲者(A,B)",
+    "graph": "/img/19.svg",
+    "nl": "A的作者是v0，v1的创造者是v0，v1的作曲者是B，那么得出A的作曲者不是B。",
+    "instance": "作者(April_Maze,Pat_Sullivan_(film_producer)) & 创造者(The_Twisted_Tales_of_Felix_the_Cat,Pat_Sullivan_(film_producer)) & 作曲者(The_Twisted_Tales_of_Felix_the_Cat,Nathan_Wang) =>not 作曲者(April_Maze,Nathan_Wang)",
+    "goldenAnswer": "FALSE",
+    "difficulty": "7",
+    "seq": "19"
+  },
+  {
+    "jodId": "",
+    "content": "唱片公司(A,v0) & 出版者(v1,v0) & 作曲者(v1,B) =>not 作曲者(A,B)",
+    "graph": "/img/20.svg",
+    "nl": "A的唱片公司是v0，v1的出版者是v0，v1的作曲者是B，那么得出A的作曲者不是B。",
+    "instance": "唱片公司(Go!!GO!GO!Go!!,Victor_Entertainment) & 出版者(Keio_Flying_Squadron,Victor_Entertainment) & 作曲者(Keio_Flying_Squadron,Tsukasa_Tawada) =>not 作曲者(Go!!GO!GO!Go!!,Tsukasa_Tawada)",
+    "goldenAnswer": "FALSE",
+    "difficulty": "8",
+    "seq": "20"
+  }
+]

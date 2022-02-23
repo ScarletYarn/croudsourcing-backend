@@ -2,7 +2,56 @@
 
 华东师范大学人机回路众包设计平台后端
 
+# Get Started
+- Env
+
+Language: Java 8~15
+
+RPC structure: thrift 
+
+
+- Windows
+
+Generate ckqa.thrift
+
+```bat
+generate.bat
+```
+
+Run server
+
+```bat
+gradlew.bat run
+(if failed)
+gradlew.bat bootRun
+```
+
+Note: If inconnected database, excuting will be around 80%, don't worry
+
+- Linux
+
+Generate ckqa.thrift
+
+```shell script
+generate.sh
+```
+
+Run server
+
+```shell script
+gradlew.sh run
+(if failed)
+gradlew.sh bootRun
+```
+
+Note: If inconnected database, excuting will be around 80%, don't worry
+
+
 # Trivial
+- config interface access
+
+See config/SecurityConfiguration.java
+
 
 - Kill dangling process on windows
 
