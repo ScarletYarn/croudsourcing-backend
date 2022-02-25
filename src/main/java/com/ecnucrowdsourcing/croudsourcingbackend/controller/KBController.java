@@ -31,12 +31,13 @@ public class KBController {
 
   @GetMapping("/qimg")
   Response<String> searchImg(@RequestParam String qimg) {
-    String rootPath = System.getProperty("user.dir");
-    String imagePath = rootPath.replace('\\', '/') + "/src/main/resources/static/images/kbImage";
+    //String rootPath = System.getProperty("user.dir");
+    //String imagePath = rootPath.replace('\\', '/') + "/src/main/resources/static/images/kbImage";
+    String imagePath = "/home/ubuntu/cs-platform/static/images/kbImage";
     File jpg_file = new File(imagePath + '/' + qimg, "google_0001.jpg");
     File png_file = new File(imagePath + '/' + qimg, "google_0001.png");
-    if(jpg_file.exists())return new Response<>(null, "images/kbimage/" + qimg + "/google_0001.jpg");
-    if(png_file.exists())return new Response<>(null, "images/kbimage/" + qimg + "/google_0001.png");
+    if(jpg_file.exists())return new Response<>(null, "images/kbImage/" + qimg + "/google_0001.jpg");
+    if(png_file.exists())return new Response<>(null, "images/kbImage/" + qimg + "/google_0001.png");
     return new Response<>(null, "NA");
   }
 
