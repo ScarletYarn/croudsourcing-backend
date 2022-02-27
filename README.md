@@ -1,6 +1,23 @@
-- 人机回路众包设计平台后端
+#人机回路众包设计平台后端
 
 华东师范大学人机回路众包设计平台后端
+
+## Setup
+
+- Start up
+```shell
+./gradlew run
+```
+
+- Build
+```shell
+./gradlew bootJar
+```
+
+- Connect to server
+
+Change IP address `java/com/ecnucrowdsourcing/croudsourcingbackend/config/RestClientConfig.java:21` to 192.168.10.162
+
 
 # Trivial
 
