@@ -3,7 +3,7 @@
 华东师范大学人机回路众包设计平台后端
 
 
-## Setup
+## Project Setup
 
 - Start up
 ```shell
@@ -19,7 +19,7 @@
 
 Change IP address `java/com/ecnucrowdsourcing/croudsourcingbackend/config/RestClientConfig.java:21` to 192.168.10.162
 
-# Get Started
+## Get Started
 - Env
 
 Language: Java 8~15
@@ -148,6 +148,32 @@ public <T> void method(List<T> clazz) {}
 
 ```java
 
+```
+
+- Elasticseach cheatsheet
+
+Get all indices
+
+```shell
+curl -X GET "localhost:9200/*?pretty"
+```
+
+Get all documents
+
+```shell
+curl -X GET "localhost:9200/<index>/_search?pretty" -H 'Content-Type: application/json' -d'
+{
+    "query": {
+        "match_all": {}
+    }
+}
+'
+```
+
+Delete index
+
+```shell
+curl -X DELETE "localhost:9200/<index>?pretty"
 ```
 
 # Bugs

@@ -1,4 +1,13 @@
 #!/usr/bin/env sh
 
+ecnucs=ubuntu@192.168.10.162
+
 echo start deploying...
-scp build/libs/croudsourcingbackend-0.0.1-SNAPSHOT.jar ecnucs:/home/ubuntu/cs-platform
+echo kill backend process...
+ssh ${ecnucs} "if [ -f \"/var/log/app.pid\" ]; then kill \$(cat /var/log/app.pid); fi"
+
+echo start backend...
+scp $(ls build/libs/*jar) ${ecnucs}:/home/ubuntu/cs-platform
+ssh ${ecnucs} "cd /home/ubuntu/cs-platform;nohup java -jar \$(ls *jar) > nohup.out 2> nohup.err &"
+
+echo deployment completed
