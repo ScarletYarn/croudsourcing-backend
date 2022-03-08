@@ -49,6 +49,7 @@ public class KBController {
     if (object != null) {
       searchSourceBuilder.query(new MatchQueryBuilder("object", object));
     }
+    searchSourceBuilder.size(3000);
     request.source(searchSourceBuilder);
     SearchResponse searchResponse = highLevelClient.search(request, RequestOptions.DEFAULT);
     List<Triple> triples = Arrays.stream(searchResponse.getHits().getHits()).map(searchHit -> {
