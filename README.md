@@ -176,7 +176,120 @@ Delete index
 curl -X DELETE "localhost:9200/<index>?pretty"
 ```
 
+Delete all documents with an index
+
+```shell
+curl -X POST "localhost:9200/<index>/_delete_by_query" -H 'Content-Type: application/json' -d'
+{
+    "query": {
+        "match_all": {}
+    }
+}
+'
+```
+
+- To create `cskg` index: search with case-insensitive exact text match
+
+```json
+PUT cskg
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "case_insensitive_analyzer": {
+          "type": "custom",
+          "filter": [
+            "lowercase"
+          ],
+          "tokenizer": "keyword"
+        }
+      }
+    }
+  },
+  "mappings": {
+    "properties": {
+      "subject": {
+        "type": "text",
+        "analyzer": "case_insensitive_analyzer"
+      },
+      "relation": {
+        "type": "text",
+        "analyzer": "case_insensitive_analyzer"
+      },
+      "object": {
+        "type": "text",
+        "analyzer": "case_insensitive_analyzer"
+      }
+    }
+  }
+}
+```
+
+- To create `cskg_vector` index: search with case-insensitive exact text match and knn
+
+```json
+PUT cskg_vector
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "case_insensitive_analyzer": {
+          "type": "custom",
+          "filter": [
+            "lowercase"
+          ],
+          "tokenizer": "keyword"
+        }
+      }
+    }
+  },
+  "mappings": {
+    "properties": {
+      "subject": {
+        "type": "text",
+        "analyzer": "case_insensitive_analyzer"
+      },
+      "relation": {
+        "type": "text",
+        "analyzer": "case_insensitive_analyzer"
+      },
+      "object": {
+        "type": "text",
+        "analyzer": "case_insensitive_analyzer"
+      },
+      "vector": {
+        "type": "dense_vector",
+        "dims": 384,
+        "index": false
+      }
+    }
+  }
+}
+```
+
+- Extend disk on ubuntu
+
+https://www.cnblogs.com/wangxingggg/articles/6846834.html
+
+```shell
+sudo lsblk # Display real disk space
+
+sudo resize2fs /dev/ubuntu-vg/root # Recalculate the disk space if `df -h` display a smaller size than real size
+```
+
 # Bugs
+
+- Not compatible with the latest `thrift`
+
+Use `thrift@0.9` instead
+
+```shell
+brew install thrift@0.9
+echo 'export PATH="/opt/homebrew/opt/thrift@0.9/bin:$PATH"' >> ~/.zshrc
+source ~/.zshrc
+
+thrift --version
+```
 
 - Documents inserted using cURL cannot be retrieved 
 

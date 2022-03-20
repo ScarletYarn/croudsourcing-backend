@@ -1,4 +1,8 @@
 #!/usr/bin/env sh
 
-rm ./src/main/java/com/ecnucrowdsourcing/croudsourcingbackend/service/thrift/* -f
+if [ -d "./src/main/java/com/ecnucrowdsourcing/croudsourcingbackend/service/thrift" ]
+then
+  rm -rf ./src/main/java/com/ecnucrowdsourcing/croudsourcingbackend/service/thrift/*
+fi
+
 thrift -out ./src/main/java --gen java:beans thrift/ckqa.thrift

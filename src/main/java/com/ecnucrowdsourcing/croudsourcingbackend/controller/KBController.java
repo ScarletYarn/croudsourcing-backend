@@ -8,7 +8,8 @@ import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.index.query.MatchQueryBuilder;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,19 +37,27 @@ public class KBController {
   @GetMapping("/q")
   Response<List<Triple>> search(
       @RequestParam(required = false) String subject,
-      @RequestParam(required = false) String object
+      @RequestParam(required = false) String object,
+      @RequestParam(required = false) String relation
   ) throws IOException {
     SearchRequest request = new SearchRequest("cskg");
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
     if (subject == null && object == null) {
       return new Response<>(null, new ArrayList<>());
     }
+
+    BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
     if (subject != null) {
-      searchSourceBuilder.query(new MatchQueryBuilder("subject", subject));
+      boolQueryBuilder.must(QueryBuilders.matchQuery("subject", subject));
     }
     if (object != null) {
-      searchSourceBuilder.query(new MatchQueryBuilder("object", object));
+      boolQueryBuilder.must(QueryBuilders.matchQuery("object", object));
     }
+    if (relation != null) {
+      boolQueryBuilder.must(QueryBuilders.matchQuery("relation", relation));
+    }
+    searchSourceBuilder.query(boolQueryBuilder);
+
     searchSourceBuilder.size(3000);
     request.source(searchSourceBuilder);
     SearchResponse searchResponse = highLevelClient.search(request, RequestOptions.DEFAULT);
@@ -60,6 +69,13 @@ public class KBController {
       return triple;
     }).collect(Collectors.toList());
     return new Response<>(null, triples);
+  }
+
+  @GetMapping("/extraction")
+  Response<List<com.ecnucrowdsourcing.croudsourcingbackend.service.thrift.Tuple>> getExtraction(
+      @RequestParam String query
+  ) {
+    return new Response<>(null, ckqaService.getExtraction(query));
   }
 
   @GetMapping("/qimg")

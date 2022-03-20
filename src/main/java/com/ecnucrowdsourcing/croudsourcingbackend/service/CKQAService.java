@@ -2,6 +2,7 @@ package com.ecnucrowdsourcing.croudsourcingbackend.service;
 
 import com.ecnucrowdsourcing.croudsourcingbackend.service.thrift.Result;
 import com.ecnucrowdsourcing.croudsourcingbackend.service.thrift.CKQA;
+import com.ecnucrowdsourcing.croudsourcingbackend.service.thrift.Tuple;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocol;
@@ -61,6 +62,24 @@ public class CKQAService {
       TProtocol protocol = new TBinaryProtocol(transport);
       CKQA.Client client = new CKQA.Client(protocol);
       results = client.getMaskWordResult(query);
+      transport.close();
+    } catch (TException e) {
+      e.printStackTrace();
+    }
+
+    return results;
+  }
+
+  public List<Tuple> getExtraction(String query) {
+    List<Tuple> results = new ArrayList<>();
+    try {
+      TTransport transport;
+      transport = new TSocket("localhost", 8327);
+      transport.open();
+
+      TProtocol protocol = new TBinaryProtocol(transport);
+      CKQA.Client client = new CKQA.Client(protocol);
+      results = client.getExtraction(query);
       transport.close();
     } catch (TException e) {
       e.printStackTrace();
