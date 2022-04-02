@@ -9,6 +9,7 @@ struct Result {
 struct Tuple {
     1: required list<string> values;
     2: required double score;
+    3: required list<double> vector;
 }
 
 service CKQA
