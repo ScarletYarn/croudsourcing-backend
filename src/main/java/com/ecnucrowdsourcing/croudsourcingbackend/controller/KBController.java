@@ -9,6 +9,7 @@ import com.ecnucrowdsourcing.croudsourcingbackend.service.thrift.Result;
 import com.ecnucrowdsourcing.croudsourcingbackend.service.thrift.Tuple;
 import com.ecnucrowdsourcing.croudsourcingbackend.util.Response;
 import com.ecnucrowdsourcing.croudsourcingbackend.util.ResponseUtil;
+import org.apache.http.client.config.RequestConfig;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
@@ -44,8 +45,8 @@ public class KBController {
   @Resource(name="elasticsearchClient")
   private RestHighLevelClient highLevelClient;
 
-  private List<Triple> searchTriples(SearchRequest request) throws IOException {
-    SearchResponse searchResponse = highLevelClient.search(request, RequestOptions.DEFAULT);
+  private List<Triple> searchTriples(SearchRequest request, RequestOptions options) throws IOException {
+    SearchResponse searchResponse = highLevelClient.search(request, options);
     return Arrays.stream(searchResponse.getHits().getHits()).map(searchHit -> {
       Triple triple = new Triple();
       triple.setId(String.valueOf(searchHit.getId()));
@@ -82,7 +83,7 @@ public class KBController {
 
     searchSourceBuilder.size(3000);
     request.source(searchSourceBuilder);
-    return new Response<>(null, searchTriples(request));
+    return new Response<>(null, searchTriples(request, RequestOptions.DEFAULT));
   }
 
   @GetMapping("/extraction")
@@ -147,31 +148,42 @@ public class KBController {
     request.source(searchSourceBuilder);
     searchSourceBuilder.query(QueryBuilders.matchQuery("query", query));
 
-    return new Response<>(null, searchTriples(request));
+    return new Response<>(null, searchTriples(request, RequestOptions.DEFAULT));
   }
 
-  @GetMapping("/similar/knn")
-  Response<List<String>> getSimilarKNN(@RequestParam List<Double> vector) throws IOException {
+  @PostMapping("/similar/knn")
+  Response<List<Triple>> getSimilarKNN(@RequestBody String vector) throws IOException {
     SearchRequest request = new SearchRequest("cskg_vector");
+    String parsedVector = vector.substring(0, vector.length() - 1).replaceAll("%2C", ",");
+    System.out.println(parsedVector);
+    RequestConfig requestConfig = RequestConfig.custom()
+        .setConnectTimeout(60000)
+        .setSocketTimeout(60000)
+        .build();
+    RequestOptions options = RequestOptions.DEFAULT.toBuilder()
+        .setRequestConfig(requestConfig)
+        .build();
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
     searchSourceBuilder.size(20);
     request.source(searchSourceBuilder);
     searchSourceBuilder.query(QueryBuilders.wrapperQuery(String.format(
-        "\"script_score\": {\n" +
-            "      \"match_all\": {},\n" +
-            "      \"script\": {\n" +
-            "        \"source\": \"cosineSimilarity(params.queryVector, 'vector') + 1.0\",\n" +
-            "        \"params\": {\n" +
-            "          \"queryVector\": %s\n" +
-            "        }\n" +
-            "      }\n" +
-            "    }",
-        vector.toString()
+      "{\n" +
+      "  \"script_score\": {\n" +
+      "    \"query\": {\n" +
+      "      \"match_all\": {}\n" +
+      "    },\n" +
+      "    \"script\": {\n" +
+      "      \"source\": \"cosineSimilarity(params.queryVector, 'vector') + 1.0\",\n" +
+      "      \"params\": {\n" +
+      "        \"queryVector\": [%s]\n" +
+      "      }\n" +
+      "    }\n" +
+      "  }\n" +
+      "}",
+      parsedVector
     )));
 
-    SearchResponse searchResponse = highLevelClient.search(request, RequestOptions.DEFAULT);
-    List<String> hitList = Arrays.stream(searchResponse.getHits().getHits()).map(SearchHit::toString).collect(Collectors.toList());
-    return new Response<>(null, hitList);
+    return new Response<>(null, searchTriples(request, options));
   }
 
   @GetMapping("/qimg")
