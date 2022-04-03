@@ -48,7 +48,7 @@ public class KBController {
     SearchResponse searchResponse = highLevelClient.search(request, RequestOptions.DEFAULT);
     return Arrays.stream(searchResponse.getHits().getHits()).map(searchHit -> {
       Triple triple = new Triple();
-      triple.setId(String.valueOf(searchHit.getSourceAsMap().get("_id")));
+      triple.setId(String.valueOf(searchHit.getId()));
       triple.setSubject(String.valueOf(searchHit.getSourceAsMap().get("subject")));
       triple.setRelation(String.valueOf(searchHit.getSourceAsMap().get("relation")));
       triple.setObject(String.valueOf(searchHit.getSourceAsMap().get("object")));
@@ -107,6 +107,8 @@ public class KBController {
     tripleComment.setTripleId(tripleId);
     tripleComment.setType(TripleCommentType.valueOf(type).name());
     tripleComment.setData(data);
+    tripleComment.setUpvote(0);
+    tripleComment.setDownvote(0);
     tripleCommentRepo.save(tripleComment);
     return responseUtil.success();
   }
