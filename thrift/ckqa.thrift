@@ -17,6 +17,7 @@ service CKQA
     list<Result> getMaskResult(1:string query);
     list<Result> getSpanResult(1:string query);
     list<Result> getMaskWordResult(1:string query);
+    list<Result> getTextQaResult(1:string query, 2:string text);
 
     list<Tuple> getExtraction(1:string query);
 }

@@ -212,4 +212,9 @@ public class KBController {
   Response<List<Result>> qaMaskWord(@RequestParam String q) {
     return new Response<>(null, ckqaService.getMaskWordResult(q));
   }
+
+  @GetMapping("/qa/textQa")
+  Response<List<Result>> getTextQaResult(@RequestParam String query, @RequestParam String text) {
+    return new Response<>(null, ckqaService.getTextQaResult(query, text));
+  }
 }

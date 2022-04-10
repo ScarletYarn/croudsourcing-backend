@@ -87,4 +87,22 @@ public class CKQAService {
 
     return results;
   }
+
+  public List<Result> getTextQaResult(String query, String text) {
+    List<Result> results = new ArrayList<>();
+    try {
+      TTransport transport;
+      transport = new TSocket("localhost", 8327);
+      transport.open();
+
+      TProtocol protocol = new TBinaryProtocol(transport);
+      CKQA.Client client = new CKQA.Client(protocol);
+      results = client.getTextQaResult(query, text);
+      transport.close();
+    } catch (TException e) {
+      e.printStackTrace();
+    }
+
+    return results;
+  }
 }
