@@ -16,7 +16,7 @@ import java.util.List;
 @Service("ckqaService")
 public class CKQAService {
 
-  public List<Result> getMaskResult(String query) {
+  public List<Result> getMaskResult(String query, Boolean includeNone, Boolean includeCSKG) {
     List<Result> results = new ArrayList<>();
     try {
       TTransport transport;
@@ -25,7 +25,7 @@ public class CKQAService {
 
       TProtocol protocol = new TBinaryProtocol(transport);
       CKQA.Client client = new CKQA.Client(protocol);
-      results = client.getMaskResult(query);
+      results = client.getMaskResult(query, includeNone, includeCSKG);
       transport.close();
     } catch (TException e) {
       e.printStackTrace();

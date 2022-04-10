@@ -199,8 +199,12 @@ public class KBController {
   }
 
   @GetMapping("/qa/mask")
-  Response<List<Result>> qaMask(@RequestParam String q) {
-    return new Response<>(null, ckqaService.getMaskResult(q));
+  Response<List<Result>> qaMask(
+      @RequestParam String q,
+      @RequestParam Boolean includeNone,
+      @RequestParam Boolean includeCSKG
+  ) {
+    return new Response<>(null, ckqaService.getMaskResult(q, includeNone, includeCSKG));
   }
 
   @GetMapping("/qa/span")
