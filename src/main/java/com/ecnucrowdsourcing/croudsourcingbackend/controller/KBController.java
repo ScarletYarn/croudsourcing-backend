@@ -142,7 +142,7 @@ public class KBController {
 
   @GetMapping("/similar/bm25")
   Response<List<Triple>> getSimilarBm25(@RequestParam String query) throws IOException {
-    SearchRequest request = new SearchRequest("cskg_vector");
+    SearchRequest request = new SearchRequest("cskg_vector_new_purge");
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
     searchSourceBuilder.size(20);
     request.source(searchSourceBuilder);
@@ -153,12 +153,12 @@ public class KBController {
 
   @PostMapping("/similar/knn")
   Response<List<Triple>> getSimilarKNN(@RequestBody String vector) throws IOException {
-    SearchRequest request = new SearchRequest("cskg_vector");
+    SearchRequest request = new SearchRequest("cskg_vector_new_purge");
     String parsedVector = vector.substring(0, vector.length() - 1).replaceAll("%2C", ",");
     System.out.println(parsedVector);
     RequestConfig requestConfig = RequestConfig.custom()
-        .setConnectTimeout(60000)
-        .setSocketTimeout(60000)
+        .setConnectTimeout(120000)
+        .setSocketTimeout(120000)
         .build();
     RequestOptions options = RequestOptions.DEFAULT.toBuilder()
         .setRequestConfig(requestConfig)
