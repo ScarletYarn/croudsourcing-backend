@@ -221,4 +221,9 @@ public class KBController {
   Response<List<Result>> getTextQaResult(@RequestParam String query, @RequestParam String text) {
     return new Response<>(null, ckqaService.getTextQaResult(query, text));
   }
+
+  @GetMapping("/entailment")
+  Response<List<Double>> getEntailment(@RequestParam String premise, @RequestParam String hypothesises) {
+    return new Response<>(null, ckqaService.getEntailment(premise, List.of(hypothesises.split(";"))));
+  }
 }

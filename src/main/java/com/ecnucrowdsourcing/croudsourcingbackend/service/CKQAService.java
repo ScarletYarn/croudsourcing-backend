@@ -105,4 +105,22 @@ public class CKQAService {
 
     return results;
   }
+
+  public List<Double> getEntailment(String premise, List<String> hypothesises) {
+    List<Double> results = new ArrayList<>();
+    try {
+      TTransport transport;
+      transport = new TSocket("localhost", 8327);
+      transport.open();
+
+      TProtocol protocol = new TBinaryProtocol(transport);
+      CKQA.Client client = new CKQA.Client(protocol);
+      results = client.getEntailment(premise, hypothesises);
+      transport.close();
+    } catch (TException e) {
+      e.printStackTrace();
+    }
+
+    return results;
+  }
 }

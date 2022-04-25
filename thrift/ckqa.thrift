@@ -20,4 +20,6 @@ service CKQA
     list<Result> getTextQaResult(1:string query, 2:string text);
 
     list<Tuple> getExtraction(1:string query);
+
+    list<double> getEntailment(1:string premise, 2:list<string> hypothesises);
 }
