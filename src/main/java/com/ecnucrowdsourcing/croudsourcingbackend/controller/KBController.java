@@ -7,6 +7,7 @@ import com.ecnucrowdsourcing.croudsourcingbackend.repository.TripleCommentRepo;
 import com.ecnucrowdsourcing.croudsourcingbackend.service.CKQAService;
 import com.ecnucrowdsourcing.croudsourcingbackend.service.thrift.Result;
 import com.ecnucrowdsourcing.croudsourcingbackend.service.thrift.Tuple;
+import com.ecnucrowdsourcing.croudsourcingbackend.service.thrift.CMS;
 import com.ecnucrowdsourcing.croudsourcingbackend.util.Response;
 import com.ecnucrowdsourcing.croudsourcingbackend.util.ResponseUtil;
 import org.apache.http.client.config.RequestConfig;
@@ -16,9 +17,11 @@ import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.indices.recovery.MultiFileWriter;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.io.IOException;
@@ -28,6 +31,8 @@ import java.util.List;
 import java.io.File;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.HashMap;
 
 @RestController
 @RequestMapping("/kb")
@@ -42,7 +47,7 @@ public class KBController {
   @Resource
   private ResponseUtil responseUtil;
 
-  @Resource(name="elasticsearchClient")
+  @Resource(name = "elasticsearchClient")
   private RestHighLevelClient highLevelClient;
 
   private List<Triple> searchTriples(SearchRequest request, RequestOptions options) throws IOException {
@@ -61,8 +66,7 @@ public class KBController {
   Response<List<Triple>> search(
       @RequestParam(required = false) String subject,
       @RequestParam(required = false) String object,
-      @RequestParam(required = false) String relation
-  ) throws IOException {
+      @RequestParam(required = false) String relation) throws IOException {
     SearchRequest request = new SearchRequest("cskg");
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
     if (subject == null && object == null) {
@@ -88,8 +92,7 @@ public class KBController {
 
   @GetMapping("/extraction")
   Response<List<Tuple>> getExtraction(
-      @RequestParam String query
-  ) {
+      @RequestParam String query) {
     return new Response<>(null, ckqaService.getExtraction(query));
   }
 
@@ -102,8 +105,7 @@ public class KBController {
   Response<Boolean> putComment(
       @RequestParam String tripleId,
       @RequestParam String type,
-      @RequestParam(required = false) String data
-  ) {
+      @RequestParam(required = false) String data) {
     TripleComment tripleComment = new TripleComment();
     tripleComment.setTripleId(tripleId);
     tripleComment.setType(TripleCommentType.valueOf(type).name());
@@ -142,7 +144,7 @@ public class KBController {
 
   @GetMapping("/similar/bm25")
   Response<List<Triple>> getSimilarBm25(@RequestParam String query) throws IOException {
-    SearchRequest request = new SearchRequest("cskg_vector_new_purge");
+    SearchRequest request = new SearchRequest("cskg_vector");
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
     searchSourceBuilder.size(20);
     request.source(searchSourceBuilder);
@@ -153,12 +155,12 @@ public class KBController {
 
   @PostMapping("/similar/knn")
   Response<List<Triple>> getSimilarKNN(@RequestBody String vector) throws IOException {
-    SearchRequest request = new SearchRequest("cskg_vector_new_purge");
+    SearchRequest request = new SearchRequest("cskg_vector");
     String parsedVector = vector.substring(0, vector.length() - 1).replaceAll("%2C", ",");
     System.out.println(parsedVector);
     RequestConfig requestConfig = RequestConfig.custom()
-        .setConnectTimeout(120000)
-        .setSocketTimeout(120000)
+        .setConnectTimeout(60000)
+        .setSocketTimeout(60000)
         .build();
     RequestOptions options = RequestOptions.DEFAULT.toBuilder()
         .setRequestConfig(requestConfig)
@@ -167,34 +169,36 @@ public class KBController {
     searchSourceBuilder.size(20);
     request.source(searchSourceBuilder);
     searchSourceBuilder.query(QueryBuilders.wrapperQuery(String.format(
-      "{\n" +
-      "  \"script_score\": {\n" +
-      "    \"query\": {\n" +
-      "      \"match_all\": {}\n" +
-      "    },\n" +
-      "    \"script\": {\n" +
-      "      \"source\": \"cosineSimilarity(params.queryVector, 'vector') + 1.0\",\n" +
-      "      \"params\": {\n" +
-      "        \"queryVector\": [%s]\n" +
-      "      }\n" +
-      "    }\n" +
-      "  }\n" +
-      "}",
-      parsedVector
-    )));
+        "{\n" +
+            "  \"script_score\": {\n" +
+            "    \"query\": {\n" +
+            "      \"match_all\": {}\n" +
+            "    },\n" +
+            "    \"script\": {\n" +
+            "      \"source\": \"cosineSimilarity(params.queryVector, 'vector') + 1.0\",\n" +
+            "      \"params\": {\n" +
+            "        \"queryVector\": [%s]\n" +
+            "      }\n" +
+            "    }\n" +
+            "  }\n" +
+            "}",
+        parsedVector)));
 
     return new Response<>(null, searchTriples(request, options));
   }
 
   @GetMapping("/qimg")
   Response<String> searchImg(@RequestParam String qimg) {
-    //String rootPath = System.getProperty("user.dir");
-    //String imagePath = rootPath.replace('\\', '/') + "/src/main/resources/static/images/kbImage";
+    // String rootPath = System.getProperty("user.dir");
+    // String imagePath = rootPath.replace('\\', '/') +
+    // "/src/main/resources/static/images/kbImage";
     String imagePath = "/home/ubuntu/cs-platform/static/images/kbImage";
     File jpg_file = new File(imagePath + '/' + qimg, "google_0001.jpg");
     File png_file = new File(imagePath + '/' + qimg, "google_0001.png");
-    if(jpg_file.exists())return new Response<>(null, "images/kbImage/" + qimg + "/google_0001.jpg");
-    if(png_file.exists())return new Response<>(null, "images/kbImage/" + qimg + "/google_0001.png");
+    if (jpg_file.exists())
+      return new Response<>(null, "images/kbImage/" + qimg + "/google_0001.jpg");
+    if (png_file.exists())
+      return new Response<>(null, "images/kbImage/" + qimg + "/google_0001.png");
     return new Response<>(null, "NA");
   }
 
@@ -202,9 +206,43 @@ public class KBController {
   Response<List<Result>> qaMask(
       @RequestParam String q,
       @RequestParam Boolean includeNone,
-      @RequestParam Boolean includeCSKG
-  ) {
+      @RequestParam Boolean includeCSKG) {
     return new Response<>(null, ckqaService.getMaskResult(q, includeNone, includeCSKG));
+  }
+
+  @GetMapping("/v2c/generate")
+  Response<Map<String, String>> get_cms(
+      @RequestParam String caption,
+      @RequestParam int video) {
+    return new Response<>(null, ckqaService.get_cms(caption, video));
+  }
+
+  @GetMapping("/v2c/video_upload")
+  Response<Boolean> videoUpload(
+      @RequestParam MultipartFile file,
+      @RequestParam int name) {
+
+    String dir = "media/";
+    int n = 1;
+    Boolean res = n > 0;
+    // boolean saved = filesService.save(files);
+    // if (!this.joinInternEnvironment.isProd())
+    // dir += "dev/";
+    // String path = this.fileService.saveFile(dir + "video/", file);
+
+    // Video video = new Video();
+    // video.setVideoTitle(videoTitle);
+    // video.setVideoDescription(videoDescription);
+    // video.setVideoPath(path);
+    // video.setValidation("unvalidated");
+    // video.setPosterId(userId);
+    // video.setPostDate(new Date());
+
+    // int n = this.videoMapper.insert(video);
+    // if (n > 0)
+    // log.info(String.format("Video %d is uploaded with path %s",
+    // video.getVideoId(), video.getVideoPath()));
+    return new Response<>(null, res);
   }
 
   @GetMapping("/qa/span")
@@ -220,10 +258,5 @@ public class KBController {
   @GetMapping("/qa/textQa")
   Response<List<Result>> getTextQaResult(@RequestParam String query, @RequestParam String text) {
     return new Response<>(null, ckqaService.getTextQaResult(query, text));
-  }
-
-  @GetMapping("/entailment")
-  Response<List<Double>> getEntailment(@RequestParam String premise, @RequestParam String hypothesises) {
-    return new Response<>(null, ckqaService.getEntailment(premise, List.of(hypothesises.split(";"))));
   }
 }
