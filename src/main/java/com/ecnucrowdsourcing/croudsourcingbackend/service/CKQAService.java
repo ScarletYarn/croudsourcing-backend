@@ -3,6 +3,8 @@ package com.ecnucrowdsourcing.croudsourcingbackend.service;
 import com.ecnucrowdsourcing.croudsourcingbackend.service.thrift.Result;
 import com.ecnucrowdsourcing.croudsourcingbackend.service.thrift.CKQA;
 import com.ecnucrowdsourcing.croudsourcingbackend.service.thrift.Tuple;
+import com.ecnucrowdsourcing.croudsourcingbackend.service.thrift.CMS;
+
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocol;
@@ -12,6 +14,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 @Service("ckqaService")
 public class CKQAService {
@@ -20,7 +24,7 @@ public class CKQAService {
     List<Result> results = new ArrayList<>();
     try {
       TTransport transport;
-      transport = new TSocket("localhost", 8327);
+      transport = new TSocket("192.168.10.67", 8327);
       transport.open();
 
       TProtocol protocol = new TBinaryProtocol(transport);
@@ -34,11 +38,30 @@ public class CKQAService {
     return results;
   }
 
+  public Map<String, String> get_cms(String query, int video) {
+    Map<String, String> results = new HashMap<String, String>();
+    // List<CMS> results = new ArrayList<>();
+    try {
+      TTransport transport;
+      transport = new TSocket("192.168.10.67", 8327);
+      transport.open();
+
+      TProtocol protocol = new TBinaryProtocol(transport);
+      CKQA.Client client = new CKQA.Client(protocol);
+      results = client.get_cms(query, video);
+      transport.close();
+    } catch (TException e) {
+      e.printStackTrace();
+    }
+
+    return results;
+  }
+
   public List<Result> getSpanResult(String query) {
     List<Result> results = new ArrayList<>();
     try {
       TTransport transport;
-      transport = new TSocket("localhost", 8327);
+      transport = new TSocket("192.168.10.67", 8327);
       transport.open();
 
       TProtocol protocol = new TBinaryProtocol(transport);
@@ -56,7 +79,7 @@ public class CKQAService {
     List<Result> results = new ArrayList<>();
     try {
       TTransport transport;
-      transport = new TSocket("localhost", 8327);
+      transport = new TSocket("192.168.10.67", 8327);
       transport.open();
 
       TProtocol protocol = new TBinaryProtocol(transport);
@@ -74,7 +97,7 @@ public class CKQAService {
     List<Tuple> results = new ArrayList<>();
     try {
       TTransport transport;
-      transport = new TSocket("localhost", 8327);
+      transport = new TSocket("192.168.10.67", 8327);
       transport.open();
 
       TProtocol protocol = new TBinaryProtocol(transport);
@@ -92,30 +115,12 @@ public class CKQAService {
     List<Result> results = new ArrayList<>();
     try {
       TTransport transport;
-      transport = new TSocket("localhost", 8327);
+      transport = new TSocket("192.168.10.67", 8327);
       transport.open();
 
       TProtocol protocol = new TBinaryProtocol(transport);
       CKQA.Client client = new CKQA.Client(protocol);
       results = client.getTextQaResult(query, text);
-      transport.close();
-    } catch (TException e) {
-      e.printStackTrace();
-    }
-
-    return results;
-  }
-
-  public List<Double> getEntailment(String premise, List<String> hypothesises) {
-    List<Double> results = new ArrayList<>();
-    try {
-      TTransport transport;
-      transport = new TSocket("localhost", 8327);
-      transport.open();
-
-      TProtocol protocol = new TBinaryProtocol(transport);
-      CKQA.Client client = new CKQA.Client(protocol);
-      results = client.getEntailment(premise, hypothesises);
       transport.close();
     } catch (TException e) {
       e.printStackTrace();
