@@ -12,5 +12,9 @@ spring:
   web:
     resources:
       static-locations:
-      - /home/ubuntu/static
+      - /home/ubuntu/cs-platform/static
       - classpath:/static
+  servlet:
+    multipart:
+      max-file-size: 25MB
+      max-request-size: 30MB

@@ -20,8 +20,13 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.indices.recovery.MultiFileWriter;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import ch.qos.logback.classic.Logger;
+
+import com.ecnucrowdsourcing.croudsourcingbackend.controller.UploadFile;
 
 import javax.annotation.Resource;
 import java.io.IOException;
@@ -32,7 +37,6 @@ import java.io.File;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.Map;
-import java.util.HashMap;
 
 @RestController
 @RequestMapping("/kb")
@@ -49,6 +53,9 @@ public class KBController {
 
   @Resource(name = "elasticsearchClient")
   private RestHighLevelClient highLevelClient;
+
+  @Resource
+  private UploadFile uploadFile;
 
   private List<Triple> searchTriples(SearchRequest request, RequestOptions options) throws IOException {
     SearchResponse searchResponse = highLevelClient.search(request, options);
@@ -217,32 +224,37 @@ public class KBController {
     return new Response<>(null, ckqaService.get_cms(caption, video));
   }
 
-  @GetMapping("/v2c/video_upload")
+  @RequestMapping(value = "/v2c/video_upload", method = RequestMethod.POST)
   Response<Boolean> videoUpload(
-      @RequestParam MultipartFile file,
-      @RequestParam int name) {
+      @RequestParam("video_file") MultipartFile file,
+      @RequestParam String name) {
 
-    String dir = "media/";
-    int n = 1;
-    Boolean res = n > 0;
-    // boolean saved = filesService.save(files);
-    // if (!this.joinInternEnvironment.isProd())
-    // dir += "dev/";
-    // String path = this.fileService.saveFile(dir + "video/", file);
+    // String dir =
+    // "192.168.10.67/mnt/ssd/wyt/ckqa-rpc/HybridNet/utils/video_feats/test/";
+    String dir = "/home/ubuntu/cs-platform/static/tmpvideo";
+    Boolean res;
+    try {
+      byte[] bytes = file.getBytes();
 
-    // Video video = new Video();
-    // video.setVideoTitle(videoTitle);
-    // video.setVideoDescription(videoDescription);
-    // video.setVideoPath(path);
-    // video.setValidation("unvalidated");
-    // video.setPosterId(userId);
-    // video.setPostDate(new Date());
+      String pat = "video[0-9]*.mp4";
+      System.out.println(name.matches(pat));
+      String newFileName = "video30001.mp4";
+      if (name.matches(pat)) {
+        name = newFileName;
+      }
+      boolean flag = UploadFile.uploadFile(bytes, dir, name);
+      System.out.println(name + "======");
+      res = flag;
 
-    // int n = this.videoMapper.insert(video);
-    // if (n > 0)
-    // log.info(String.format("Video %d is uploaded with path %s",
-    // video.getVideoId(), video.getVideoPath()));
-    return new Response<>(null, res);
+      return new Response<>(null, res);
+    } catch (Exception e) {
+      e.printStackTrace();
+      System.out.println(e);
+
+      res = false;
+      return new Response<>(null, res);
+    }
+
   }
 
   @GetMapping("/qa/span")

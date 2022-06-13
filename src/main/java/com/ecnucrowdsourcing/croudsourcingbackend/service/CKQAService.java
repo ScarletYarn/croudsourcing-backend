@@ -3,7 +3,6 @@ package com.ecnucrowdsourcing.croudsourcingbackend.service;
 import com.ecnucrowdsourcing.croudsourcingbackend.service.thrift.Result;
 import com.ecnucrowdsourcing.croudsourcingbackend.service.thrift.CKQA;
 import com.ecnucrowdsourcing.croudsourcingbackend.service.thrift.Tuple;
-import com.ecnucrowdsourcing.croudsourcingbackend.service.thrift.CMS;
 
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
