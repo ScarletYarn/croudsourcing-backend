@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-ecnucs=ubuntu@192.168.10.162
+ecnucs=wyt
 
 echo start deploying...
 echo kill backend process...

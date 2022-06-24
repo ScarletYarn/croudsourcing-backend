@@ -151,7 +151,7 @@ public class KBController {
 
   @GetMapping("/similar/bm25")
   Response<List<Triple>> getSimilarBm25(@RequestParam String query) throws IOException {
-    SearchRequest request = new SearchRequest("cskg_vector");
+    SearchRequest request = new SearchRequest("cskg_vector_new_purge");
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
     searchSourceBuilder.size(20);
     request.source(searchSourceBuilder);
@@ -162,12 +162,12 @@ public class KBController {
 
   @PostMapping("/similar/knn")
   Response<List<Triple>> getSimilarKNN(@RequestBody String vector) throws IOException {
-    SearchRequest request = new SearchRequest("cskg_vector");
+    SearchRequest request = new SearchRequest("cskg_vector_new_purge");
     String parsedVector = vector.substring(0, vector.length() - 1).replaceAll("%2C", ",");
     System.out.println(parsedVector);
     RequestConfig requestConfig = RequestConfig.custom()
-        .setConnectTimeout(60000)
-        .setSocketTimeout(60000)
+        .setConnectTimeout(120000)
+        .setSocketTimeout(120000)
         .build();
     RequestOptions options = RequestOptions.DEFAULT.toBuilder()
         .setRequestConfig(requestConfig)
@@ -177,19 +177,20 @@ public class KBController {
     request.source(searchSourceBuilder);
     searchSourceBuilder.query(QueryBuilders.wrapperQuery(String.format(
         "{\n" +
-            "  \"script_score\": {\n" +
-            "    \"query\": {\n" +
-            "      \"match_all\": {}\n" +
-            "    },\n" +
-            "    \"script\": {\n" +
-            "      \"source\": \"cosineSimilarity(params.queryVector, 'vector') + 1.0\",\n" +
-            "      \"params\": {\n" +
-            "        \"queryVector\": [%s]\n" +
-            "      }\n" +
-            "    }\n" +
-            "  }\n" +
-            "}",
-        parsedVector)));
+        "  \"script_score\": {\n" +
+        "    \"query\": {\n" +
+        "      \"match_all\": {}\n" +
+        "    },\n" +
+        "    \"script\": {\n" +
+        "      \"source\": \"cosineSimilarity(params.queryVector, 'vector') + 1.0\",\n" +
+        "      \"params\": {\n" +
+        "        \"queryVector\": [%s]\n" +
+        "      }\n" +
+        "    }\n" +
+        "  }\n" +
+        "}",
+        parsedVector
+    )));
 
     return new Response<>(null, searchTriples(request, options));
   }
@@ -270,5 +271,10 @@ public class KBController {
   @GetMapping("/qa/textQa")
   Response<List<Result>> getTextQaResult(@RequestParam String query, @RequestParam String text) {
     return new Response<>(null, ckqaService.getTextQaResult(query, text));
+  }
+
+  @GetMapping("/entailment")
+  Response<List<Double>> getEntailment(@RequestParam String premise, @RequestParam String hypothesises) {
+    return new Response<>(null, ckqaService.getEntailment(premise, List.of(hypothesises.split(";"))));
   }
 }

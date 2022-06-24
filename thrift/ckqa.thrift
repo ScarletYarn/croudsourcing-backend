@@ -26,6 +26,8 @@ service CKQA
 
     list<Tuple> getExtraction(1:string query);
 
+    list<double> getEntailment(1:string premise, 2:list<string> hypothesises);
+
     # list<CMS> get_cms(1:string query, 2:i32 video);
     map<string,string> get_cms(1:string query, 2:i32 video);
 }
