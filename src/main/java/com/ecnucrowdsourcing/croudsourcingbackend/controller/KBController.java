@@ -7,36 +7,25 @@ import com.ecnucrowdsourcing.croudsourcingbackend.repository.TripleCommentRepo;
 import com.ecnucrowdsourcing.croudsourcingbackend.service.CKQAService;
 import com.ecnucrowdsourcing.croudsourcingbackend.service.thrift.Result;
 import com.ecnucrowdsourcing.croudsourcingbackend.service.thrift.Tuple;
-import com.ecnucrowdsourcing.croudsourcingbackend.service.thrift.CMS;
 import com.ecnucrowdsourcing.croudsourcingbackend.util.Response;
 import com.ecnucrowdsourcing.croudsourcingbackend.util.ResponseUtil;
 import org.apache.http.client.config.RequestConfig;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.indices.recovery.MultiFileWriter;
-import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import ch.qos.logback.classic.Logger;
-
-import com.ecnucrowdsourcing.croudsourcingbackend.controller.UploadFile;
-
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.io.File;
-import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/kb")
@@ -57,6 +46,8 @@ public class KBController {
   @Resource
   private UploadFile uploadFile;
 
+  public static String esIndex = "cskg_vector_new_purge";
+
   private List<Triple> searchTriples(SearchRequest request, RequestOptions options) throws IOException {
     SearchResponse searchResponse = highLevelClient.search(request, options);
     return Arrays.stream(searchResponse.getHits().getHits()).map(searchHit -> {
@@ -74,7 +65,7 @@ public class KBController {
       @RequestParam(required = false) String subject,
       @RequestParam(required = false) String object,
       @RequestParam(required = false) String relation) throws IOException {
-    SearchRequest request = new SearchRequest("cskg");
+    SearchRequest request = new SearchRequest(esIndex);
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
     if (subject == null && object == null) {
       return new Response<>(null, new ArrayList<>());
@@ -151,7 +142,7 @@ public class KBController {
 
   @GetMapping("/similar/bm25")
   Response<List<Triple>> getSimilarBm25(@RequestParam String query) throws IOException {
-    SearchRequest request = new SearchRequest("cskg_vector_new_purge");
+    SearchRequest request = new SearchRequest(esIndex);
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
     searchSourceBuilder.size(20);
     request.source(searchSourceBuilder);
@@ -162,9 +153,8 @@ public class KBController {
 
   @PostMapping("/similar/knn")
   Response<List<Triple>> getSimilarKNN(@RequestBody String vector) throws IOException {
-    SearchRequest request = new SearchRequest("cskg_vector_new_purge");
+    SearchRequest request = new SearchRequest(esIndex);
     String parsedVector = vector.substring(0, vector.length() - 1).replaceAll("%2C", ",");
-    System.out.println(parsedVector);
     RequestConfig requestConfig = RequestConfig.custom()
         .setConnectTimeout(120000)
         .setSocketTimeout(120000)
@@ -276,5 +266,24 @@ public class KBController {
   @GetMapping("/entailment")
   Response<List<Double>> getEntailment(@RequestParam String premise, @RequestParam String hypothesises) {
     return new Response<>(null, ckqaService.getEntailment(premise, List.of(hypothesises.split(";"))));
+  }
+
+  @PostMapping("/modifyTriple")
+  Response<Boolean> modifyTriple(
+      @RequestParam String id,
+      @RequestParam String subject,
+      @RequestParam String relation,
+      @RequestParam String object
+  ) throws IOException {
+    UpdateRequest updateRequest = new UpdateRequest(esIndex, id);
+    System.out.printf("Attempting to modify triple: id=%s%n", id);
+    Map<String, Object> jsonMap = new HashMap<>();
+    jsonMap.put("subject", subject);
+    jsonMap.put("relation", relation);
+    jsonMap.put("object", object);
+    updateRequest.doc(jsonMap);
+
+    highLevelClient.update(updateRequest, RequestOptions.DEFAULT);
+    return responseUtil.success();
   }
 }
