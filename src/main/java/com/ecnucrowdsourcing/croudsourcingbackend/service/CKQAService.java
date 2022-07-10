@@ -2,6 +2,7 @@ package com.ecnucrowdsourcing.croudsourcingbackend.service;
 
 import com.ecnucrowdsourcing.croudsourcingbackend.service.thrift.Result;
 import com.ecnucrowdsourcing.croudsourcingbackend.service.thrift.CKQA;
+import com.ecnucrowdsourcing.croudsourcingbackend.service.thrift.Scale;
 import com.ecnucrowdsourcing.croudsourcingbackend.service.thrift.Tuple;
 
 import org.apache.thrift.TException;
@@ -144,5 +145,23 @@ public class CKQAService {
     }
 
     return results;
+  }
+
+  public Scale getScale() {
+    Scale scale = new Scale();
+    try {
+      TTransport transport;
+      transport = new TSocket("localhost", 8327);
+      transport.open();
+
+      TProtocol protocol = new TBinaryProtocol(transport);
+      CKQA.Client client = new CKQA.Client(protocol);
+      scale = client.getScale();
+      transport.close();
+    } catch (TException e) {
+      e.printStackTrace();
+    }
+
+    return scale;
   }
 }

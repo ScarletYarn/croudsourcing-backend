@@ -112,8 +112,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     /* If csrf protection is enabled, request method will be limited without the token
      * If requests don't come from browser, http 403 will occur */
-    if (indexPrefixProvider.profile.equals("dev")) http.csrf().disable();
-    else http.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());	
+//    if (indexPrefixProvider.profile.equals("dev")) http.csrf().disable();
+//    else http.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
+
+    http.csrf().disable();
 
     /*http.authorizeRequests()
             .anyRequest().permitAll().and().logout().permitAll();*/

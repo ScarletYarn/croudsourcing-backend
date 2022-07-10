@@ -1,11 +1,15 @@
 package com.ecnucrowdsourcing.croudsourcingbackend.controller;
 
+import com.ecnucrowdsourcing.croudsourcingbackend.entity.ScaleDimP2;
 import com.ecnucrowdsourcing.croudsourcingbackend.entity.constant.TripleCommentType;
+import com.ecnucrowdsourcing.croudsourcingbackend.entity.dto.ScaleDimP1;
 import com.ecnucrowdsourcing.croudsourcingbackend.entity.kb.Triple;
 import com.ecnucrowdsourcing.croudsourcingbackend.entity.kb.TripleComment;
+import com.ecnucrowdsourcing.croudsourcingbackend.repository.ScaleDimP2Repo;
 import com.ecnucrowdsourcing.croudsourcingbackend.repository.TripleCommentRepo;
 import com.ecnucrowdsourcing.croudsourcingbackend.service.CKQAService;
 import com.ecnucrowdsourcing.croudsourcingbackend.service.thrift.Result;
+import com.ecnucrowdsourcing.croudsourcingbackend.service.thrift.Scale;
 import com.ecnucrowdsourcing.croudsourcingbackend.service.thrift.Tuple;
 import com.ecnucrowdsourcing.croudsourcingbackend.util.Response;
 import com.ecnucrowdsourcing.croudsourcingbackend.util.ResponseUtil;
@@ -15,6 +19,7 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.core.CountRequest;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -25,6 +30,7 @@ import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.*;
 import java.io.File;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @RestController
@@ -46,7 +52,12 @@ public class KBController {
   @Resource
   private UploadFile uploadFile;
 
-  public static String esIndex = "cskg_vector_new_purge";
+  public static String esIndex = "cskg_combined";
+
+  @Resource
+  private ScaleDimP2Repo scaleDimP2Repo;
+
+  private final String uniqueScaleId = "iScaleId";
 
   private List<Triple> searchTriples(SearchRequest request, RequestOptions options) throws IOException {
     SearchResponse searchResponse = highLevelClient.search(request, options);
@@ -284,6 +295,50 @@ public class KBController {
     updateRequest.doc(jsonMap);
 
     highLevelClient.update(updateRequest, RequestOptions.DEFAULT);
+    return responseUtil.success();
+  }
+
+  @GetMapping("/scale/p1")
+  Response<ScaleDimP1> queryScaleP1() throws IOException {
+    ScaleDimP1 scaleDimP1 = new ScaleDimP1();
+
+    CountRequest countAllTripleRequest = new CountRequest(esIndex);
+    countAllTripleRequest.query(QueryBuilders.matchAllQuery());
+    long allTriple = highLevelClient.count(countAllTripleRequest, RequestOptions.DEFAULT).getCount();
+
+    CountRequest countAllCnTripleRequest = new CountRequest(esIndex);
+    countAllCnTripleRequest.query(QueryBuilders.matchQuery("lang", "zh"));
+    long allTripleZh = highLevelClient.count(countAllCnTripleRequest, RequestOptions.DEFAULT).getCount();
+
+    scaleDimP1.setTripleCount(allTriple);
+    scaleDimP1.setTripleCountZh(allTripleZh);
+
+    return new Response<>(null, scaleDimP1);
+  }
+
+  @GetMapping("/scale/p2")
+  Response<ScaleDimP2> queryScaleP2() {
+    Optional<ScaleDimP2> scaleDimP2Optional = scaleDimP2Repo.findById(uniqueScaleId);
+    return new Response<>(null, scaleDimP2Optional.orElse(null));
+  }
+
+  @PostMapping("/scale/refresh")
+  Response<Boolean> refreshScale() {
+    ScaleDimP2 scaleDimP2 = scaleDimP2Repo.findById(uniqueScaleId).get();
+    if (!scaleDimP2.getIsRefreshing()) {
+      scaleDimP2.setIsRefreshing(true);
+      scaleDimP2Repo.save(scaleDimP2);
+      CompletableFuture.supplyAsync(() -> {
+        Scale scale = ckqaService.getScale();
+        ScaleDimP2 asyncScaleDimP2 = scaleDimP2Repo.findById(uniqueScaleId).get();
+        asyncScaleDimP2.setIsRefreshing(false);
+        asyncScaleDimP2.setLastRefreshDate(new Date());
+        asyncScaleDimP2.setEntityCount((long) scale.getEntityCount());
+        asyncScaleDimP2.setEntityCountZh((long) scale.getEntityCountCn());
+        scaleDimP2Repo.save(asyncScaleDimP2);
+        return null;
+      });
+    }
     return responseUtil.success();
   }
 }
