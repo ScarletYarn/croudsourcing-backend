@@ -22,6 +22,10 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.core.CountRequest;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.script.Script;
+import org.elasticsearch.search.aggregations.AggregationBuilder;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.metrics.Cardinality;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -336,6 +340,64 @@ public class KBController {
         asyncScaleDimP2.setEntityCount((long) scale.getEntityCount());
         asyncScaleDimP2.setEntityCountZh((long) scale.getEntityCountCn());
         scaleDimP2Repo.save(asyncScaleDimP2);
+        return null;
+      });
+    }
+    return responseUtil.success();
+  }
+
+  @PostMapping("/scale/refresh/fast")
+  Response<Boolean> refreshScaleFast() {
+    ScaleDimP2 scaleDimP2 = scaleDimP2Repo.findById(uniqueScaleId).get();
+    if (!scaleDimP2.getIsRefreshing()) {
+      scaleDimP2.setIsRefreshing(true);
+      scaleDimP2Repo.save(scaleDimP2);
+      CompletableFuture.supplyAsync(() -> {
+        RequestConfig requestConfig = RequestConfig.custom()
+            .setConnectTimeout(600000)
+            .setSocketTimeout(600000)
+            .build();
+        RequestOptions options = RequestOptions.DEFAULT.toBuilder()
+            .setRequestConfig(requestConfig)
+            .build();
+
+        Script script = new Script("return [doc['subject'], doc['object']]");
+        AggregationBuilder aggregationBuilder = AggregationBuilders.cardinality("cardinality").script(script);
+
+        SearchRequest enSearchRequest = new SearchRequest(esIndex);
+        SearchSourceBuilder enSearchSourceBuilder = new SearchSourceBuilder();
+        enSearchSourceBuilder.size(0);
+        enSearchSourceBuilder.query(QueryBuilders.matchAllQuery());
+        enSearchSourceBuilder.aggregation(aggregationBuilder);
+        enSearchRequest.source(enSearchSourceBuilder);
+
+        SearchRequest zhSearchRequest = new SearchRequest(esIndex);
+        SearchSourceBuilder zhSearchSourceBuilder = new SearchSourceBuilder();
+        zhSearchSourceBuilder.size(0);
+        zhSearchSourceBuilder.query(QueryBuilders.matchQuery("lang", "zh"));
+        zhSearchSourceBuilder.aggregation(aggregationBuilder);
+        zhSearchRequest.source(zhSearchSourceBuilder);
+
+        ScaleDimP2 asyncScaleDimP2 = scaleDimP2Repo.findById(uniqueScaleId).get();
+        asyncScaleDimP2.setIsRefreshing(false);
+
+        try {
+          SearchResponse enSearchResponse = highLevelClient.search(enSearchRequest, options);
+          SearchResponse zhSearchResponse = highLevelClient.search(zhSearchRequest, options);
+
+          long enCount = ((Cardinality) enSearchResponse.getAggregations().get("cardinality")).getValue();
+          long zhCount = ((Cardinality) zhSearchResponse.getAggregations().get("cardinality")).getValue();
+
+          asyncScaleDimP2.setLastRefreshDate(new Date());
+          asyncScaleDimP2.setEntityCount(enCount + zhCount);
+          asyncScaleDimP2.setEntityCountZh(zhCount);
+
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+
+        scaleDimP2Repo.save(asyncScaleDimP2);
+
         return null;
       });
     }
