@@ -178,20 +178,19 @@ public class KBController {
     request.source(searchSourceBuilder);
     searchSourceBuilder.query(QueryBuilders.wrapperQuery(String.format(
         "{\n" +
-        "  \"script_score\": {\n" +
-        "    \"query\": {\n" +
-        "      \"match_all\": {}\n" +
-        "    },\n" +
-        "    \"script\": {\n" +
-        "      \"source\": \"cosineSimilarity(params.queryVector, 'vector') + 1.0\",\n" +
-        "      \"params\": {\n" +
-        "        \"queryVector\": [%s]\n" +
-        "      }\n" +
-        "    }\n" +
-        "  }\n" +
-        "}",
-        parsedVector
-    )));
+            "  \"script_score\": {\n" +
+            "    \"query\": {\n" +
+            "      \"match_all\": {}\n" +
+            "    },\n" +
+            "    \"script\": {\n" +
+            "      \"source\": \"cosineSimilarity(params.queryVector, 'vector') + 1.0\",\n" +
+            "      \"params\": {\n" +
+            "        \"queryVector\": [%s]\n" +
+            "      }\n" +
+            "    }\n" +
+            "  }\n" +
+            "}",
+        parsedVector)));
 
     return new Response<>(null, searchTriples(request, options));
   }
@@ -231,9 +230,8 @@ public class KBController {
       @RequestParam("video_file") MultipartFile file,
       @RequestParam String name) {
 
-    // String dir =
-    // "192.168.10.67/mnt/ssd/wyt/ckqa-rpc/HybridNet/utils/video_feats/test/";
-    String dir = "/home/ubuntu/cs-platform/static/tmpvideo";
+    String dir = "/mnt/ssd/wyt/ckqa-rpc/HybridNet/utils/video_feats/test/";
+    // String dir = "/home/ubuntu/cs-platform/static/tmpvideo";
     Boolean res;
     try {
       byte[] bytes = file.getBytes();
@@ -284,8 +282,7 @@ public class KBController {
       @RequestParam String id,
       @RequestParam String subject,
       @RequestParam String relation,
-      @RequestParam String object
-  ) throws IOException {
+      @RequestParam String object) throws IOException {
     UpdateRequest updateRequest = new UpdateRequest(esIndex, id);
     System.out.printf("Attempting to modify triple: id=%s%n", id);
     Map<String, Object> jsonMap = new HashMap<>();
