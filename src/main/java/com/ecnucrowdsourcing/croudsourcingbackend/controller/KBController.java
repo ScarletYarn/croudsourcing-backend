@@ -182,18 +182,20 @@ public class KBController {
     request.source(searchSourceBuilder);
     searchSourceBuilder.query(QueryBuilders.wrapperQuery(String.format(
         "{\n" +
-            "  \"script_score\": {\n" +
-            "    \"query\": {\n" +
-            "      \"match_all\": {}\n" +
-            "    },\n" +
-            "    \"script\": {\n" +
-            "      \"source\": \"cosineSimilarity(params.queryVector, 'vector') + 1.0\",\n" +
-            "      \"params\": {\n" +
-            "        \"queryVector\": [%s]\n" +
-            "      }\n" +
-            "    }\n" +
-            "  }\n" +
-            "}",
+        "  \"script_score\": {\n" +
+        "    \"query\": {\n" +
+        "      \"exists\": {" +
+        "        \"field\": \"vector\"" +
+        "      }\n" +
+        "    },\n" +
+        "    \"script\": {\n" +
+        "      \"source\": \"cosineSimilarity(params.queryVector, 'vector') + 1.0\",\n" +
+        "      \"params\": {\n" +
+        "        \"queryVector\": [%s]\n" +
+        "      }\n" +
+        "    }\n" +
+        "  }\n" +
+        "}",
         parsedVector)));
 
     return new Response<>(null, searchTriples(request, options));
@@ -364,7 +366,7 @@ public class KBController {
         SearchRequest enSearchRequest = new SearchRequest(esIndex);
         SearchSourceBuilder enSearchSourceBuilder = new SearchSourceBuilder();
         enSearchSourceBuilder.size(0);
-        enSearchSourceBuilder.query(QueryBuilders.matchAllQuery());
+        enSearchSourceBuilder.query(QueryBuilders.matchQuery("lang", "en"));
         enSearchSourceBuilder.aggregation(aggregationBuilder);
         enSearchRequest.source(enSearchSourceBuilder);
 
