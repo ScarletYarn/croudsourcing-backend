@@ -129,30 +129,17 @@ public class KBController {
     return responseUtil.success();
   }
 
-  @PostMapping("/triple/comment/up")
-  Response<Boolean> upvote(@RequestParam String id) {
-    Optional<TripleComment> tripleCommentOptional = tripleCommentRepo.findById(id);
-    if (tripleCommentOptional.isPresent()) {
-      TripleComment tripleComment = tripleCommentOptional.get();
-      tripleComment.setUpvote(tripleComment.getUpvote() + 1);
-      tripleCommentRepo.save(tripleComment);
-      return responseUtil.success();
+  @PostMapping("/triple/comment/upOrDown")
+  Response<Boolean> commentVote(@RequestParam String id, @RequestParam boolean isUpvote, @RequestParam boolean isCancel) {
+    TripleComment tripleComment = tripleCommentRepo.findById(id).get();
+    if (isUpvote) {
+      tripleComment.setUpvote(tripleComment.getUpvote() + (isCancel ? -1 : 1));
     } else {
-      return responseUtil.fail("No comment found");
+      tripleComment.setDownvote(tripleComment.getDownvote() + (isCancel ? -1 : 1));
     }
-  }
 
-  @PostMapping("/triple/comment/down")
-  Response<Boolean> downvote(@RequestParam String id) {
-    Optional<TripleComment> tripleCommentOptional = tripleCommentRepo.findById(id);
-    if (tripleCommentOptional.isPresent()) {
-      TripleComment tripleComment = tripleCommentOptional.get();
-      tripleComment.setDownvote(tripleComment.getDownvote() + 1);
-      tripleCommentRepo.save(tripleComment);
-      return responseUtil.success();
-    } else {
-      return responseUtil.fail("No comment found");
-    }
+    tripleCommentRepo.save(tripleComment);
+    return responseUtil.success();
   }
 
   @GetMapping("/similar/bm25")
