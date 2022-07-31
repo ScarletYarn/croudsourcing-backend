@@ -11,4 +11,6 @@ public class Triple {
   private String relation;
 
   private String object;
+
+  private Double score;
 }

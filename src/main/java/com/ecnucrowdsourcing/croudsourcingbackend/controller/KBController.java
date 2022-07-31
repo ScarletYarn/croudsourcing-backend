@@ -8,6 +8,7 @@ import com.ecnucrowdsourcing.croudsourcingbackend.entity.kb.TripleComment;
 import com.ecnucrowdsourcing.croudsourcingbackend.repository.ScaleDimP2Repo;
 import com.ecnucrowdsourcing.croudsourcingbackend.repository.TripleCommentRepo;
 import com.ecnucrowdsourcing.croudsourcingbackend.service.CKQAService;
+import com.ecnucrowdsourcing.croudsourcingbackend.service.thrift.CompletionResult;
 import com.ecnucrowdsourcing.croudsourcingbackend.service.thrift.Result;
 import com.ecnucrowdsourcing.croudsourcingbackend.service.thrift.Scale;
 import com.ecnucrowdsourcing.croudsourcingbackend.service.thrift.Tuple;
@@ -71,6 +72,10 @@ public class KBController {
       triple.setSubject(String.valueOf(searchHit.getSourceAsMap().get("subject")));
       triple.setRelation(String.valueOf(searchHit.getSourceAsMap().get("relation")));
       triple.setObject(String.valueOf(searchHit.getSourceAsMap().get("object")));
+      Object score = searchHit.getSourceAsMap().get("score");
+      if (score != null) {
+        triple.setScore(Double.valueOf(String.valueOf(score)));
+      }
       return triple;
     }).collect(Collectors.toList());
   }
@@ -387,6 +392,33 @@ public class KBController {
         return null;
       });
     }
+    return responseUtil.success();
+  }
+
+  @PostMapping("/scale/refresh/reset")
+  Response<Boolean> resetRefresh() {
+    ScaleDimP2 scaleDimP2 = scaleDimP2Repo.findById(uniqueScaleId).get();
+    scaleDimP2.setIsRefreshing(false);
+    scaleDimP2Repo.save(scaleDimP2);
+    return responseUtil.success();
+  }
+
+  @GetMapping("/completion")
+  Response<List<CompletionResult>> tailPrediction(
+      @RequestParam String head,
+      @RequestParam String rel,
+      @RequestParam Boolean isInv
+  ) {
+    return new Response<>(null, ckqaService.getCompletion(head, rel, isInv));
+  }
+
+  @PostMapping("/populate")
+  Response<Boolean> populateKB(
+      @RequestParam String subject,
+      @RequestParam String relation,
+      @RequestParam String object
+  ) {
+    ckqaService.upsert(null, subject, relation, object);
     return responseUtil.success();
   }
 }

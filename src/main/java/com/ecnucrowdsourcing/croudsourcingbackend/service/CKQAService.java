@@ -1,9 +1,6 @@
 package com.ecnucrowdsourcing.croudsourcingbackend.service;
 
-import com.ecnucrowdsourcing.croudsourcingbackend.service.thrift.Result;
-import com.ecnucrowdsourcing.croudsourcingbackend.service.thrift.CKQA;
-import com.ecnucrowdsourcing.croudsourcingbackend.service.thrift.Scale;
-import com.ecnucrowdsourcing.croudsourcingbackend.service.thrift.Tuple;
+import com.ecnucrowdsourcing.croudsourcingbackend.service.thrift.*;
 
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
@@ -163,5 +160,40 @@ public class CKQAService {
     }
 
     return scale;
+  }
+
+  public List<CompletionResult> getCompletion(String head, String rel, boolean isInv) {
+    List<CompletionResult> results = new ArrayList<>();
+    try {
+      TTransport transport;
+      transport = new TSocket("localhost", 8327);
+      transport.open();
+
+      TProtocol protocol = new TBinaryProtocol(transport);
+      CKQA.Client client = new CKQA.Client(protocol);
+      results = client.getCompletion(head, rel, isInv);
+      transport.close();
+    } catch (TException e) {
+      e.printStackTrace();
+    }
+
+    return results;
+  }
+
+  public void upsert(
+      String id, String subject, String relation, String object
+  ) {
+    try {
+      TTransport transport;
+      transport = new TSocket("localhost", 8327);
+      transport.open();
+
+      TProtocol protocol = new TBinaryProtocol(transport);
+      CKQA.Client client = new CKQA.Client(protocol);
+      client.upsert(id, subject, relation, object);
+      transport.close();
+    } catch (TException e) {
+      e.printStackTrace();
+    }
   }
 }

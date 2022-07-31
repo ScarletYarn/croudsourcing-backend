@@ -17,6 +17,12 @@ struct Scale {
 	2: required i32 entityCountCn;
 }
 
+struct CompletionResult {
+	1: required string item;
+	2: required double score;
+	3: required bool exist;
+}
+
 service CKQA
 {
     list<Result> getMaskResult(1:string query, 2:bool includeNone, 3:bool includeCSKG);
@@ -30,4 +36,7 @@ service CKQA
     map<string,string> get_cms(1:string query,2:i32 video);
 
     Scale getScale();
+
+    list<CompletionResult> getCompletion(1:string head, 2:string rel, 3:bool isInv);
+    void upsert(1:string id, 2: string subject, 3:string relation, 4:string object);
 }
